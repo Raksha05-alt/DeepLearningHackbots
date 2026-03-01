@@ -1,1 +1,267 @@
-[]
+[
+  {
+    "id": "bf32297a-3ad9-4119-8eea-b167d03dd18e",
+    "created_at": "2026-02-22T11:47:22.891991+00:00",
+    "source": "hotline_text",
+    "report_text": "Two men fighting outside a bar on Clarke Quay, one has a broken bottle, crowd of about 15 people watching, one person bleeding from the head.",
+    "location_hint": "Clarke Quay",
+    "structured": {
+      "incident_type": "violence_conflict",
+      "key_entities": {
+        "location": "Clarke Quay",
+        "people_count": 15,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 1,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.86,
+      "missing_info": []
+    },
+    "triage": {
+      "score": 25,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported",
+        "crowd level 1/3"
+      ]
+    },
+    "recommended": null,
+    "status": "resolved"
+  },
+  {
+    "id": "3a74f37f-b50d-45f2-a3b2-f90f86dcabc1",
+    "created_at": "2026-02-22T17:47:22.891991+00:00",
+    "source": "radio_transcript",
+    "report_text": "Smoke coming from the 5th floor of a residential building on Tampines Street 21. Residents evacuating. No injuries reported yet.",
+    "location_hint": "Tampines Street 21",
+    "structured": {
+      "incident_type": "fire_smoke",
+      "key_entities": {
+        "location": "Tampines Street 21",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": true
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 15,
+      "priority": "P3",
+      "reasons": [
+        "fire/smoke detected"
+      ]
+    },
+    "recommended": null,
+    "status": "resolved"
+  },
+  {
+    "id": "8c05041b-f42b-425f-ada7-e96b8833c80f",
+    "created_at": "2026-02-22T23:47:22.891991+00:00",
+    "source": "citizen_app",
+    "report_text": "Suspicious man loitering near the primary school entrance on Bukit Timah Road. Wearing a dark hoodie, carrying a large bag. Has been there for over 30 minutes.",
+    "location_hint": "Bukit Timah Road",
+    "structured": {
+      "incident_type": "suspicious_person",
+      "key_entities": {
+        "location": "Bukit Timah Road",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "status": "resolved"
+  },
+  {
+    "id": "6c741c7f-5371-4aa6-97cf-84626399bcac",
+    "created_at": "2026-02-23T05:47:22.891991+00:00",
+    "source": "hotline_text",
+    "report_text": "Major traffic accident on PIE near Toa Payoh exit. 3 vehicles involved including a motorcycle. 2 people injured, one trapped in the car.",
+    "location_hint": "PIE Toa Payoh Exit",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "PIE Toa Payoh Exit",
+        "people_count": 2,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.86,
+      "missing_info": []
+    },
+    "triage": {
+      "score": 20,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported"
+      ]
+    },
+    "recommended": null,
+    "status": "resolved"
+  },
+  {
+    "id": "8ed23bbc-7cb9-42f5-afe7-eef6d0fe0275",
+    "created_at": "2026-02-23T11:47:22.891991+00:00",
+    "source": "radio_transcript",
+    "report_text": "Large crowd gathering at Speakers Corner, estimated 200 people, some pushing and shoving at the front. Situation could escalate. Drunk individuals spotted.",
+    "location_hint": "Speakers Corner",
+    "structured": {
+      "incident_type": "crowd_risk",
+      "key_entities": {
+        "location": "Speakers Corner",
+        "people_count": 200,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 1,
+        "crowd_level": 3,
+        "intoxication_suspected": true,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 28,
+      "priority": "P3",
+      "reasons": [
+        "crowd level 3/3",
+        "aggression level 1/3",
+        "intoxication suspected"
+      ]
+    },
+    "recommended": null,
+    "status": "resolved"
+  },
+  {
+    "id": "f554982a-7b69-4338-80ff-0fe626261e7c",
+    "created_at": "2026-02-23T17:47:22.891991+00:00",
+    "source": "citizen_app",
+    "report_text": "Elderly woman collapsed at Bedok MRT station, appears unconscious, bystanders performing CPR. No AED available on site.",
+    "location_hint": "Bedok MRT",
+    "structured": {
+      "incident_type": "medical",
+      "key_entities": {
+        "location": "Bedok MRT",
+        "people_count": null,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 20,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported"
+      ]
+    },
+    "recommended": null,
+    "status": "resolved"
+  },
+  {
+    "id": "90385531-33db-417a-acfa-2751b044a067",
+    "created_at": "2026-03-01T11:49:02.882685+00:00",
+    "source": "hotline_text",
+    "report_text": "Man with knife threatening people at Orchard Road MRT, crowd gathering, 2 injured",
+    "location_hint": "Orchard",
+    "structured": {
+      "incident_type": "crowd_risk",
+      "key_entities": {
+        "location": "Orchard",
+        "people_count": 2,
+        "injuries_present": true,
+        "weapon_mentioned": true,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 2,
+        "crowd_level": 2,
+        "intoxication_suspected": false,
+        "active_threat": true
+      },
+      "confidence": 1.0,
+      "missing_info": []
+    },
+    "triage": {
+      "score": 100,
+      "priority": "P0",
+      "reasons": [
+        "weapon mentioned",
+        "active threat detected",
+        "injuries reported"
+      ]
+    },
+    "recommended": {
+      "action": "dispatch_now",
+      "follow_up_questions": [
+        "Is the crowd moving or stationary?",
+        "Are there any visible agitators or instigators?",
+        "What triggered the crowd gathering?"
+      ],
+      "checklist": [
+        "Assess crowd size and density",
+        "Deploy crowd-control resources",
+        "Identify exit routes and clear them",
+        "Set up medical triage station nearby",
+        "Coordinate with event organisers if applicable"
+      ],
+      "rationale": "Triage score 100/100 (P0). Key factors: weapon mentioned, active threat detected, injuries reported. Similar past incident (violence_conflict, similarity 31%) supports this assessment."
+    },
+    "status": "open"
+  }
+]

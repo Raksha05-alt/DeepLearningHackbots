@@ -2,11 +2,38 @@
 IntelResponse – FastAPI application entry point.
 """
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from .models import IncidentCreate, StatusUpdate
-from .storage import create_incident, get_incident, list_incidents, update_incident
+from .storage import (
+    create_incident,
+    get_incident,
+    list_incidents,
+    list_incidents_raw,
+    update_incident,
+)
+from .extraction import extract_incident_features
+from .scoring import compute_triage_score
+from .similarity import get_similar_cases
+from .recommendations import recommend_response
+from .seed import seed_if_empty
+
+# ---------------------------------------------------------------------------
+# Lifespan – seed data on startup
+# ---------------------------------------------------------------------------
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Seed the database with historical incidents if it's empty."""
+    count = seed_if_empty()
+    if count:
+        print(f"[seed] Inserted {count} historical incidents.")
+    yield
+
 
 # ---------------------------------------------------------------------------
 # App
@@ -15,7 +42,8 @@ from .storage import create_incident, get_incident, list_incidents, update_incid
 app = FastAPI(
     title="IntelResponse",
     description="AI-powered incident intelligence platform",
-    version="0.1.0",
+    version="0.2.0",
+    lifespan=lifespan,
 )
 
 # ---------------------------------------------------------------------------
@@ -52,9 +80,35 @@ async def health():
 
 @app.post("/incidents", status_code=status.HTTP_201_CREATED)
 async def post_incident(body: IncidentCreate):
-    """Create a new incident and return it."""
+    """Create a new incident, run the intelligence pipeline, and return it."""
+    # 1. Persist the raw incident
     incident = create_incident(body)
-    return incident
+
+    # 2. Extract structured features
+    structured = extract_incident_features(
+        incident.report_text, incident.location_hint
+    )
+
+    # 3. Compute triage score
+    triage = compute_triage_score(structured)
+
+    # 4. Find similar historical cases (graceful if none exist)
+    historical = list_incidents_raw()
+    # Exclude the just-created incident from similarity search
+    historical = [h for h in historical if h.get("id") != incident.id]
+    similar = get_similar_cases(structured, historical, k=5)
+
+    # 5. Generate recommendations
+    recommended = recommend_response(structured, triage, similar)
+
+    # 6. Persist enriched data back to the incident
+    updated = update_incident(incident.id, {
+        "structured": structured,
+        "triage": triage,
+        "recommended": recommended,
+    })
+
+    return updated
 
 
 @app.get("/incidents")

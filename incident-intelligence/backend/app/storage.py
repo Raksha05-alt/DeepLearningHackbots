@@ -89,6 +89,11 @@ def list_incidents() -> List[Incident]:
     return [Incident(**r) for r in records]
 
 
+def list_incidents_raw() -> List[Dict[str, Any]]:
+    """Return all incidents as plain dicts (for internal use like similarity)."""
+    return _read_db()
+
+
 def get_incident(incident_id: str) -> Optional[Incident]:
     """Return a single incident by *id*, or ``None`` if not found."""
     for record in _read_db():
