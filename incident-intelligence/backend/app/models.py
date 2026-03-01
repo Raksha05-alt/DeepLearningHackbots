@@ -14,6 +14,11 @@ from pydantic import BaseModel, Field
 
 SourceType = Literal["hotline_text", "radio_transcript", "citizen_app"]
 StatusType = Literal["open", "resolved", "escalated", "false_alarm"]
+OutcomeType = Literal["resolved", "escalated", "false_alarm"]
+ResponseType = Literal[
+    "monitor", "verbal_engagement", "security_dispatched",
+    "medical_dispatched", "evacuation",
+]
 
 # ---------------------------------------------------------------------------
 # Request bodies
@@ -49,4 +54,6 @@ class Incident(BaseModel):
     structured: Optional[Any] = None
     triage: Optional[Any] = None
     recommended: Optional[Any] = None
+    outcome: Optional[OutcomeType] = None
+    response_taken: Optional[ResponseType] = None
     status: StatusType = "open"

@@ -2,6 +2,7 @@
 IntelResponse – FastAPI application entry point.
 """
 
+from collections import Counter
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, status
@@ -42,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="IntelResponse",
     description="AI-powered incident intelligence platform",
-    version="0.2.0",
+    version="0.3.0",
     lifespan=lifespan,
 )
 
@@ -92,9 +93,8 @@ async def post_incident(body: IncidentCreate):
     # 3. Compute triage score
     triage = compute_triage_score(structured)
 
-    # 4. Find similar historical cases (graceful if none exist)
+    # 4. Find similar historical cases (only those with known outcomes)
     historical = list_incidents_raw()
-    # Exclude the just-created incident from similarity search
     historical = [h for h in historical if h.get("id") != incident.id]
     similar = get_similar_cases(structured, historical, k=5)
 
@@ -133,3 +133,32 @@ async def update_incident_status(incident_id: str, body: StatusUpdate):
     if updated is None:
         raise HTTPException(status_code=404, detail="Incident not found")
     return updated
+
+# ---------------------------------------------------------------------------
+# Stats endpoint
+# ---------------------------------------------------------------------------
+
+
+@app.get("/stats")
+async def get_stats():
+    """Return aggregate counts by outcome and incident_type."""
+    records = list_incidents_raw()
+
+    outcome_counts: Counter = Counter()
+    type_counts: Counter = Counter()
+
+    for r in records:
+        outcome = r.get("outcome")
+        if outcome:
+            outcome_counts[outcome] += 1
+
+        structured = r.get("structured")
+        if isinstance(structured, dict):
+            itype = structured.get("incident_type", "unknown")
+            type_counts[itype] += 1
+
+    return {
+        "total_incidents": len(records),
+        "by_outcome": dict(outcome_counts),
+        "by_incident_type": dict(type_counts),
+    }

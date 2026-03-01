@@ -80,6 +80,9 @@ def get_similar_cases(
 ) -> List[Dict[str, Any]]:
     """Return the *k* most similar historical incidents.
 
+    Only incidents with a non-null ``outcome`` are considered as valid
+    historical references (i.e. they have a known resolution).
+
     Parameters
     ----------
     current_features : dict
@@ -98,6 +101,8 @@ def get_similar_cases(
           "incident_id": str,
           "incident_type": str,
           "similarity_score": float (0-1, higher = more similar),
+          "outcome": str | None,
+          "response_taken": str | None,
           "report_text_preview": str (first 120 chars),
         }
 
@@ -111,6 +116,10 @@ def get_similar_cases(
     scored: List[Dict[str, Any]] = []
 
     for inc in historical_incidents:
+        # Only use incidents with known outcomes as historical references
+        if inc.get("outcome") is None:
+            continue
+
         structured = inc.get("structured")
         if not isinstance(structured, dict):
             continue  # skip incidents without extraction data
@@ -123,6 +132,8 @@ def get_similar_cases(
             "incident_id": inc.get("id", "unknown"),
             "incident_type": structured.get("incident_type", "unknown"),
             "similarity_score": similarity,
+            "outcome": inc.get("outcome"),
+            "response_taken": inc.get("response_taken"),
             "report_text_preview": inc.get("report_text", "")[:120],
         })
 

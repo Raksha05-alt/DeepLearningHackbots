@@ -1,16 +1,129 @@
 [
   {
-    "id": "bf32297a-3ad9-4119-8eea-b167d03dd18e",
-    "created_at": "2026-02-22T11:47:22.891991+00:00",
+    "id": "7139fff5-3480-4bb1-a699-b59bf9d37ff1",
+    "created_at": "2026-01-30T12:27:19.892256+00:00",
     "source": "hotline_text",
-    "report_text": "Two men fighting outside a bar on Clarke Quay, one has a broken bottle, crowd of about 15 people watching, one person bleeding from the head.",
-    "location_hint": "Clarke Quay",
+    "report_text": "Elderly woman collapsed at Bedok MRT station, appears unconscious, bystanders performing CPR. No AED available on site.",
+    "location_hint": "Bedok MRT",
     "structured": {
-      "incident_type": "violence_conflict",
+      "incident_type": "medical",
       "key_entities": {
-        "location": "Clarke Quay",
-        "people_count": 15,
+        "location": "Bedok MRT",
+        "people_count": null,
         "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 20,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "medical_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "a1d495c7-1719-4389-81e5-e18f409a642a",
+    "created_at": "2026-01-30T20:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Man having a seizure on the floor at Jurong East mall food court. People are standing around but nobody seems trained to help.",
+    "location_hint": "Jurong East Mall",
+    "structured": {
+      "incident_type": "medical",
+      "key_entities": {
+        "location": "Jurong East Mall",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "medical_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "5800ffb3-5849-4b4f-ba92-3fd86682ee45",
+    "created_at": "2026-01-31T04:27:19.892256+00:00",
+    "source": "radio_transcript",
+    "report_text": "Construction worker fell from scaffolding at Punggol site. Conscious but unable to move his legs, bleeding from head wound.",
+    "location_hint": "Punggol Construction Site",
+    "structured": {
+      "incident_type": "medical",
+      "key_entities": {
+        "location": "Punggol Construction Site",
+        "people_count": null,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 20,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported"
+      ]
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "medical_dispatched",
+    "status": "escalated"
+  },
+  {
+    "id": "3071e8e5-1527-4f74-b5de-61ce8fc8c421",
+    "created_at": "2026-01-31T12:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Child choking at a restaurant on East Coast Road. Parents panicking. Someone is attempting the Heimlich manoeuvre.",
+    "location_hint": "East Coast Road",
+    "structured": {
+      "incident_type": "medical",
+      "key_entities": {
+        "location": "East Coast Road",
+        "people_count": null,
+        "injuries_present": false,
         "weapon_mentioned": false,
         "smoke_fire_present": false
       },
@@ -20,23 +133,103 @@
         "intoxication_suspected": false,
         "active_threat": false
       },
-      "confidence": 0.86,
-      "missing_info": []
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
     },
     "triage": {
-      "score": 25,
+      "score": 5,
       "priority": "P3",
       "reasons": [
-        "injuries reported",
         "crowd level 1/3"
       ]
     },
     "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "medical_dispatched",
     "status": "resolved"
   },
   {
-    "id": "3a74f37f-b50d-45f2-a3b2-f90f86dcabc1",
-    "created_at": "2026-02-22T17:47:22.891991+00:00",
+    "id": "0d87efd5-bc13-4a6c-a0e1-34a8f963d40e",
+    "created_at": "2026-01-31T20:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Cyclist hit by opening car door at Tampines Ave 5. Cyclist on the ground, possible broken arm, conscious and alert.",
+    "location_hint": "Tampines Ave 5",
+    "structured": {
+      "incident_type": "violence_conflict",
+      "key_entities": {
+        "location": "Tampines Ave 5",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "medical_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "d65071ab-1770-45da-a674-5d6f968cb9b2",
+    "created_at": "2026-02-01T04:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Person fainted inside crowded bus 174 near Bishan. Bus has pulled over. Passenger appears dehydrated.",
+    "location_hint": "Bishan",
+    "structured": {
+      "incident_type": "medical",
+      "key_entities": {
+        "location": "Bishan",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 1,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 5,
+      "priority": "P3",
+      "reasons": [
+        "crowd level 1/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "medical_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "12d74a82-9c9c-4138-b70b-b407cb269a07",
+    "created_at": "2026-02-01T12:27:19.892256+00:00",
     "source": "radio_transcript",
     "report_text": "Smoke coming from the 5th floor of a residential building on Tampines Street 21. Residents evacuating. No injuries reported yet.",
     "location_hint": "Tampines Street 21",
@@ -68,11 +261,361 @@
       ]
     },
     "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "evacuation",
     "status": "resolved"
   },
   {
-    "id": "8c05041b-f42b-425f-ada7-e96b8833c80f",
-    "created_at": "2026-02-22T23:47:22.891991+00:00",
+    "id": "04a99a23-4e9d-4541-a871-c784d872534e",
+    "created_at": "2026-02-01T20:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Kitchen fire in a HDB unit at Toa Payoh Lorong 4. Flames visible from window. Fire alarm triggered, residents in corridor.",
+    "location_hint": "Toa Payoh Lorong 4",
+    "structured": {
+      "incident_type": "fire_smoke",
+      "key_entities": {
+        "location": "Toa Payoh Lorong 4",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": true
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 15,
+      "priority": "P3",
+      "reasons": [
+        "fire/smoke detected"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "evacuation",
+    "status": "resolved"
+  },
+  {
+    "id": "13b33e51-559a-4b6a-a682-aae183fb4d59",
+    "created_at": "2026-02-02T04:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Car engine on fire in the carpark at Vivo City level B2. Thick black smoke. Sprinkler system has activated.",
+    "location_hint": "Vivo City B2 Carpark",
+    "structured": {
+      "incident_type": "fire_smoke",
+      "key_entities": {
+        "location": "Vivo City B2 Carpark",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": true
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 15,
+      "priority": "P3",
+      "reasons": [
+        "fire/smoke detected"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "evacuation",
+    "status": "resolved"
+  },
+  {
+    "id": "9efaeaf6-ebda-4352-9aff-74802be9dc32",
+    "created_at": "2026-02-02T12:27:19.892256+00:00",
+    "source": "radio_transcript",
+    "report_text": "Suspected gas leak at an industrial unit on Tuas South Ave 1. Strong smell of gas reported by multiple workers.",
+    "location_hint": "Tuas South Ave 1",
+    "structured": {
+      "incident_type": "fire_smoke",
+      "key_entities": {
+        "location": "Tuas South Ave 1",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "evacuation",
+    "status": "escalated"
+  },
+  {
+    "id": "e4c2ae81-cd22-435a-9b84-8b16978b1b70",
+    "created_at": "2026-02-02T20:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Small rubbish bin fire at a void deck on Yishun Ring Road. No injuries but smoke drifting towards the playground.",
+    "location_hint": "Yishun Ring Road",
+    "structured": {
+      "incident_type": "fire_smoke",
+      "key_entities": {
+        "location": "Yishun Ring Road",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": true
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 15,
+      "priority": "P3",
+      "reasons": [
+        "fire/smoke detected"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "monitor",
+    "status": "resolved"
+  },
+  {
+    "id": "90cbdb09-a024-4367-b5b5-adb437fd3b1f",
+    "created_at": "2026-02-03T04:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Two men fighting outside a bar on Clarke Quay, one has a broken bottle, crowd of about 15 people watching, one person bleeding from the head.",
+    "location_hint": "Clarke Quay",
+    "structured": {
+      "incident_type": "violence_conflict",
+      "key_entities": {
+        "location": "Clarke Quay",
+        "people_count": 15,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 1,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.86,
+      "missing_info": []
+    },
+    "triage": {
+      "score": 25,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported",
+        "crowd level 1/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "security_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "daf83bee-2ba7-473c-a828-03aedb577cf5",
+    "created_at": "2026-02-03T12:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Group of 4 teenagers punching a man near Ang Mo Kio MRT. Victim on the ground. Attackers still present.",
+    "location_hint": "Ang Mo Kio MRT",
+    "structured": {
+      "incident_type": "violence_conflict",
+      "key_entities": {
+        "location": "Ang Mo Kio MRT",
+        "people_count": null,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 20,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported"
+      ]
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "security_dispatched",
+    "status": "escalated"
+  },
+  {
+    "id": "1df91d50-9ff6-4c8b-a243-86dd132c0331",
+    "created_at": "2026-02-03T20:27:19.892256+00:00",
+    "source": "radio_transcript",
+    "report_text": "Domestic argument at Block 302 Hougang Ave 5. Shouting and sounds of things being thrown. Children heard crying inside the unit.",
+    "location_hint": "Hougang Ave 5",
+    "structured": {
+      "incident_type": "other",
+      "key_entities": {
+        "location": "Hougang Ave 5",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 1,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.44,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear",
+        "incident_type_unclear"
+      ]
+    },
+    "triage": {
+      "score": 8,
+      "priority": "P3",
+      "reasons": [
+        "aggression level 1/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "security_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "30f36e2c-9d0a-4877-919b-2ef1e37a5f36",
+    "created_at": "2026-02-04T04:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Man with knife threatening staff at 7-Eleven on Geylang Road. Demanding money from the register. 2 customers inside.",
+    "location_hint": "Geylang Road",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "Geylang Road",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": true,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 2,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": true
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 71,
+      "priority": "P1",
+      "reasons": [
+        "weapon mentioned",
+        "active threat detected",
+        "aggression level 2/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "security_dispatched",
+    "status": "escalated"
+  },
+  {
+    "id": "c108b1f9-5220-4088-b1cd-2540a08c451b",
+    "created_at": "2026-02-04T12:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Road rage incident on CTE near Braddell exit. Two drivers out of their cars pushing each other. Traffic building up.",
+    "location_hint": "CTE Braddell Exit",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "CTE Braddell Exit",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 1,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 8,
+      "priority": "P3",
+      "reasons": [
+        "aggression level 1/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "verbal_engagement",
+    "status": "resolved"
+  },
+  {
+    "id": "3ed76ed2-f8b3-4e62-a3eb-67e39f9b8b07",
+    "created_at": "2026-02-04T20:27:19.892256+00:00",
     "source": "citizen_app",
     "report_text": "Suspicious man loitering near the primary school entrance on Bukit Timah Road. Wearing a dark hoodie, carrying a large bag. Has been there for over 30 minutes.",
     "location_hint": "Bukit Timah Road",
@@ -103,20 +646,22 @@
       "reasons": []
     },
     "recommended": null,
-    "status": "resolved"
+    "outcome": "false_alarm",
+    "response_taken": "verbal_engagement",
+    "status": "escalated"
   },
   {
-    "id": "6c741c7f-5371-4aa6-97cf-84626399bcac",
-    "created_at": "2026-02-23T05:47:22.891991+00:00",
+    "id": "fce51ac0-027e-4461-a977-3db058e5b881",
+    "created_at": "2026-02-05T04:27:19.892256+00:00",
     "source": "hotline_text",
-    "report_text": "Major traffic accident on PIE near Toa Payoh exit. 3 vehicles involved including a motorcycle. 2 people injured, one trapped in the car.",
-    "location_hint": "PIE Toa Payoh Exit",
+    "report_text": "Unknown person trying door handles of parked cars at Sengkang East Way carpark. Wearing gloves and looking around nervously.",
+    "location_hint": "Sengkang East Way",
     "structured": {
-      "incident_type": "traffic_accident",
+      "incident_type": "other",
       "key_entities": {
-        "location": "PIE Toa Payoh Exit",
-        "people_count": 2,
-        "injuries_present": true,
+        "location": "Sengkang East Way",
+        "people_count": null,
+        "injuries_present": false,
         "weapon_mentioned": false,
         "smoke_fire_present": false
       },
@@ -126,22 +671,102 @@
         "intoxication_suspected": false,
         "active_threat": false
       },
-      "confidence": 0.86,
-      "missing_info": []
-    },
-    "triage": {
-      "score": 20,
-      "priority": "P3",
-      "reasons": [
-        "injuries reported"
+      "confidence": 0.44,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear",
+        "incident_type_unclear"
       ]
     },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
     "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "security_dispatched",
+    "status": "escalated"
+  },
+  {
+    "id": "16ddd5a6-1992-4cfe-84f6-d1a4420ff08d",
+    "created_at": "2026-02-05T12:27:19.892256+00:00",
+    "source": "radio_transcript",
+    "report_text": "Woman reports being followed for three blocks by a man in a dark jacket near Novena MRT. She has ducked into a convenience store.",
+    "location_hint": "Novena MRT",
+    "structured": {
+      "incident_type": "other",
+      "key_entities": {
+        "location": "Novena MRT",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.44,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear",
+        "incident_type_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "security_dispatched",
     "status": "resolved"
   },
   {
-    "id": "8ed23bbc-7cb9-42f5-afe7-eef6d0fe0275",
-    "created_at": "2026-02-23T11:47:22.891991+00:00",
+    "id": "8c991897-b491-4331-9d68-53099d4337df",
+    "created_at": "2026-02-05T20:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Someone spotted peering into ground-floor windows at Pasir Ris Street 11 at 2am. Left when a dog started barking.",
+    "location_hint": "Pasir Ris Street 11",
+    "structured": {
+      "incident_type": "other",
+      "key_entities": {
+        "location": "Pasir Ris Street 11",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.44,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear",
+        "incident_type_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "false_alarm",
+    "response_taken": "monitor",
+    "status": "escalated"
+  },
+  {
+    "id": "a79f20b8-1552-4778-a70e-afce2331635f",
+    "created_at": "2026-02-06T04:27:19.892256+00:00",
     "source": "radio_transcript",
     "report_text": "Large crowd gathering at Speakers Corner, estimated 200 people, some pushing and shoving at the front. Situation could escalate. Drunk individuals spotted.",
     "location_hint": "Speakers Corner",
@@ -175,18 +800,174 @@
       ]
     },
     "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "security_dispatched",
     "status": "resolved"
   },
   {
-    "id": "f554982a-7b69-4338-80ff-0fe626261e7c",
-    "created_at": "2026-02-23T17:47:22.891991+00:00",
-    "source": "citizen_app",
-    "report_text": "Elderly woman collapsed at Bedok MRT station, appears unconscious, bystanders performing CPR. No AED available on site.",
-    "location_hint": "Bedok MRT",
+    "id": "840fec6c-101c-4c5e-a1c4-215a88f2d8d3",
+    "created_at": "2026-02-06T12:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Crowd surge at a concert venue near The Star Theatre. People at the front being crushed. Event staff overwhelmed.",
+    "location_hint": "The Star Theatre",
     "structured": {
-      "incident_type": "medical",
+      "incident_type": "crowd_risk",
       "key_entities": {
-        "location": "Bedok MRT",
+        "location": "The Star Theatre",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 2,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 10,
+      "priority": "P3",
+      "reasons": [
+        "crowd level 2/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "evacuation",
+    "status": "escalated"
+  },
+  {
+    "id": "ea3c0c6b-174b-4649-966c-2ca42ea6a8f6",
+    "created_at": "2026-02-06T20:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Flash mob gathering at Orchard Road causing pedestrian congestion. About 50 people dancing, blocking the pavement. No hostility.",
+    "location_hint": "Orchard Road",
+    "structured": {
+      "incident_type": "crowd_risk",
+      "key_entities": {
+        "location": "Orchard Road",
+        "people_count": 50,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 2,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 10,
+      "priority": "P3",
+      "reasons": [
+        "crowd level 2/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "monitor",
+    "status": "resolved"
+  },
+  {
+    "id": "365a583a-4317-4e22-9ced-f9ab112012d3",
+    "created_at": "2026-02-07T04:27:19.892256+00:00",
+    "source": "radio_transcript",
+    "report_text": "Unruly crowd of about 30 outside a nightclub on Circular Road after a fight broke out inside. Some are intoxicated and aggressive.",
+    "location_hint": "Circular Road",
+    "structured": {
+      "incident_type": "crowd_risk",
+      "key_entities": {
+        "location": "Circular Road",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 2,
+        "crowd_level": 2,
+        "intoxication_suspected": true,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 31,
+      "priority": "P3",
+      "reasons": [
+        "aggression level 2/3",
+        "crowd level 2/3",
+        "intoxication suspected"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "security_dispatched",
+    "status": "resolved"
+  },
+  {
+    "id": "0cafcfa9-ffae-41e5-a160-2c106d734aa1",
+    "created_at": "2026-02-07T12:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Major traffic accident on PIE near Toa Payoh exit. 3 vehicles involved including a motorcycle. 2 people injured, one trapped in the car.",
+    "location_hint": "PIE Toa Payoh Exit",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "PIE Toa Payoh Exit",
+        "people_count": 2,
+        "injuries_present": true,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.86,
+      "missing_info": []
+    },
+    "triage": {
+      "score": 20,
+      "priority": "P3",
+      "reasons": [
+        "injuries reported"
+      ]
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "medical_dispatched",
+    "status": "escalated"
+  },
+  {
+    "id": "32168704-ba8f-4b6f-b56e-3bd713b2e970",
+    "created_at": "2026-02-07T20:27:19.892256+00:00",
+    "source": "radio_transcript",
+    "report_text": "Pedestrian hit by a van at the Woodlands Checkpoint. Victim is lying on the road, conscious. Van has stopped. Traffic jam forming.",
+    "location_hint": "Woodlands Checkpoint",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "Woodlands Checkpoint",
         "people_count": null,
         "injuries_present": true,
         "weapon_mentioned": false,
@@ -211,11 +992,166 @@
       ]
     },
     "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "medical_dispatched",
     "status": "resolved"
   },
   {
-    "id": "90385531-33db-417a-acfa-2751b044a067",
-    "created_at": "2026-03-01T11:49:02.882685+00:00",
+    "id": "5af7caa7-61da-4d6d-8d0b-00839112dee6",
+    "created_at": "2026-02-08T04:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Minor fender bender at the junction of Clementi Road and Commonwealth Ave. No injuries but both drivers arguing loudly.",
+    "location_hint": "Clementi Rd / Commonwealth Ave",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "Clementi Rd / Commonwealth Ave",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.58,
+      "missing_info": [
+        "people_count"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "verbal_engagement",
+    "status": "resolved"
+  },
+  {
+    "id": "ce47811b-eb39-481f-aa37-12fa81d375f1",
+    "created_at": "2026-02-08T12:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Motorcycle skidded on wet road at Bukit Batok East Ave 3. Rider thrown off, helmet cracked. Not moving.",
+    "location_hint": "Bukit Batok East Ave 3",
+    "structured": {
+      "incident_type": "traffic_accident",
+      "key_entities": {
+        "location": "Bukit Batok East Ave 3",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": true,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.72,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear"
+      ]
+    },
+    "triage": {
+      "score": 30,
+      "priority": "P3",
+      "reasons": [
+        "weapon mentioned"
+      ]
+    },
+    "recommended": null,
+    "outcome": "escalated",
+    "response_taken": "medical_dispatched",
+    "status": "escalated"
+  },
+  {
+    "id": "c9b68d33-486d-401f-a2c6-953cca32885d",
+    "created_at": "2026-02-08T20:27:19.892256+00:00",
+    "source": "citizen_app",
+    "report_text": "Strong chemical smell coming from a drain near Block 45 Lorong 5 Toa Payoh. Several residents complaining of nausea.",
+    "location_hint": "Toa Payoh Lorong 5",
+    "structured": {
+      "incident_type": "other",
+      "key_entities": {
+        "location": "Toa Payoh Lorong 5",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 0,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.44,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear",
+        "incident_type_unclear"
+      ]
+    },
+    "triage": {
+      "score": 0,
+      "priority": "P3",
+      "reasons": []
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "monitor",
+    "status": "resolved"
+  },
+  {
+    "id": "92c9ebaa-cc46-4808-b20b-7d272a5e5574",
+    "created_at": "2026-02-09T04:27:19.892256+00:00",
+    "source": "hotline_text",
+    "report_text": "Stray dog acting aggressively in the playground at Sembawang Drive. Snapping at children. Parents keeping kids away.",
+    "location_hint": "Sembawang Drive",
+    "structured": {
+      "incident_type": "other",
+      "key_entities": {
+        "location": "Sembawang Drive",
+        "people_count": null,
+        "injuries_present": false,
+        "weapon_mentioned": false,
+        "smoke_fire_present": false
+      },
+      "risk_factors": {
+        "aggression_level": 2,
+        "crowd_level": 0,
+        "intoxication_suspected": false,
+        "active_threat": false
+      },
+      "confidence": 0.44,
+      "missing_info": [
+        "people_count",
+        "injury_status_unclear",
+        "incident_type_unclear"
+      ]
+    },
+    "triage": {
+      "score": 16,
+      "priority": "P3",
+      "reasons": [
+        "aggression level 2/3"
+      ]
+    },
+    "recommended": null,
+    "outcome": "resolved",
+    "response_taken": "verbal_engagement",
+    "status": "resolved"
+  },
+  {
+    "id": "a5bb6cc3-0a8b-4c44-b1c0-1459dd577568",
+    "created_at": "2026-03-01T12:28:11.624023+00:00",
     "source": "hotline_text",
     "report_text": "Man with knife threatening people at Orchard Road MRT, crowd gathering, 2 injured",
     "location_hint": "Orchard",
@@ -260,8 +1196,10 @@
         "Set up medical triage station nearby",
         "Coordinate with event organisers if applicable"
       ],
-      "rationale": "Triage score 100/100 (P0). Key factors: weapon mentioned, active threat detected, injuries reported. Similar past incident (violence_conflict, similarity 31%) supports this assessment."
+      "rationale": "Triage score 100/100 (P0). Key factors: weapon mentioned, active threat detected, injuries reported. Similar past incident (traffic_accident, similarity 42%) supports this assessment."
     },
+    "outcome": null,
+    "response_taken": null,
     "status": "open"
   }
 ]
