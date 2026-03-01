@@ -1,7 +1,2 @@
-// TODO: Create reusable UI components
-// - IncidentCard
-// - IOCBadge
-// - RiskGauge
-// - SimilarityGraph
-
-export { }
+export { default as IncidentCard } from "./IncidentCard";
+export { default as IncidentDetail } from "./IncidentDetail";
