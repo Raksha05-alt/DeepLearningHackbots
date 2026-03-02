@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
     ReportCard,
     ReportDetail,
@@ -27,9 +27,14 @@ function App() {
     const [incidentsLoading, setIncidentsLoading] = useState(true);
     const [incidentsError, setIncidentsError] = useState<string | null>(null);
 
-    // ---- Swipe state ----
-    const touchStartX = useRef<number | null>(null);
-    const swiping = useRef(false);
+    // ---- Tab switching helpers ----
+    const switchTab = useCallback((dir: 1 | -1) => {
+        setActiveTab((cur) => {
+            const idx = TABS.indexOf(cur);
+            const next = idx + dir;
+            return next >= 0 && next < TABS.length ? TABS[next] : cur;
+        });
+    }, []);
 
     // ---- Load reports ----
     const loadReports = useCallback(async () => {
@@ -119,39 +124,21 @@ function App() {
         }
     };
 
-    // ---- Swipe handlers ----
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX;
-        swiping.current = true;
-    };
-
-    const handleTouchEnd = (e: React.TouchEvent) => {
-        if (!swiping.current || touchStartX.current === null) return;
-        const diff = e.changedTouches[0].clientX - touchStartX.current;
-        const threshold = 60;
-        if (Math.abs(diff) > threshold) {
-            const currentIdx = TABS.indexOf(activeTab);
-            if (diff < 0 && currentIdx < TABS.length - 1) {
-                // swipe left → next tab
-                setActiveTab(TABS[currentIdx + 1]);
-            } else if (diff > 0 && currentIdx > 0) {
-                // swipe right → previous tab
-                setActiveTab(TABS[currentIdx - 1]);
-            }
-        }
-        touchStartX.current = null;
-        swiping.current = false;
-    };
+    // ---- Keyboard arrow nav ----
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === "ArrowLeft") switchTab(-1);
+            if (e.key === "ArrowRight") switchTab(1);
+        };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, [switchTab]);
 
     const selectedReport = reports.find((r) => r.id === selectedReportId) ?? null;
     const selectedIncident = incidents.find((i) => i.id === selectedIncidentId) ?? null;
 
     return (
-        <div
-            className="app-layout"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-        >
+        <div className="app-layout">
             {/* ---- Sidebar ---- */}
             <aside className="sidebar">
                 <div className="sidebar-header">
@@ -262,6 +249,17 @@ function App() {
 
             {/* ---- Main Content ---- */}
             <main className="main-content">
+                {/* Left arrow */}
+                {activeTab !== TABS[0] && (
+                    <button
+                        className="tab-arrow tab-arrow-left"
+                        onClick={() => switchTab(-1)}
+                        title="Previous tab (←)"
+                    >
+                        ‹
+                    </button>
+                )}
+
                 {activeTab === "reports" && selectedReport ? (
                     <ReportDetail
                         report={selectedReport}
@@ -288,6 +286,17 @@ function App() {
                                 : "Choose an active incident to manage"}
                         </p>
                     </div>
+                )}
+
+                {/* Right arrow */}
+                {activeTab !== TABS[TABS.length - 1] && (
+                    <button
+                        className="tab-arrow tab-arrow-right"
+                        onClick={() => switchTab(1)}
+                        title="Next tab (→)"
+                    >
+                        ›
+                    </button>
                 )}
             </main>
         </div>
