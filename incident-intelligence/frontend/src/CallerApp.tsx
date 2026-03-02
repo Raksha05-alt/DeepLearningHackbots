@@ -3,7 +3,8 @@
  *
  * This is shown at /caller.html and is intended for callers/citizens.
  * After recording, the transcription is classified and POSTed to the
- * dashboard's backend so it appears in the Incoming Reports queue.
+ * dashboard's backend so it appears in the Incoming Reports queue
+ * (or merges into an existing active incident).
  */
 
 import { useRef, useState } from "react";
@@ -50,7 +51,15 @@ export default function CallerApp() {
                         body: JSON.stringify(result.report),
                     });
                     if (!res.ok) throw new Error("Failed to submit report");
+                    const data = await res.json();
                     setSubmitted(result.report);
+
+                    // If merged into existing incident, note it
+                    if (data.status === "merged") {
+                        setLastText(
+                            `${result.transcription}\n\n(Merged into existing incident)`
+                        );
+                    }
                 } catch (err: any) {
                     setError(err.message ?? "Something went wrong. Please try again.");
                 } finally {
@@ -87,116 +96,118 @@ export default function CallerApp() {
     }
 
     return (
-        <div className="caller-app">
-            {/* Header */}
-            <header className="caller-header">
-                <div className="caller-logo">
-                    <span className="caller-logo-icon">📞</span>
-                    <div>
-                        <h1>Report an Incident</h1>
-                        <p className="caller-subtitle">IntelResponse Public Safety Hotline</p>
-                    </div>
-                </div>
-            </header>
-
-            <main className="caller-main">
+        <div className="caller-app-light">
+            <main className="caller-main-light">
                 {/* Success state */}
                 {submitted ? (
-                    <div className="caller-success">
-                        <div className="caller-success-icon">✅</div>
+                    <div className="caller-success-light">
+                        <div className="caller-success-check">✅</div>
                         <h2>Report Submitted</h2>
-                        <p className="caller-success-text">
+                        <p className="caller-success-desc">
                             Your report has been received and is being processed by our dispatch team.
                         </p>
 
-                        <div className="caller-summary">
-                            <div className="caller-summary-row">
-                                <span className="caller-summary-label">Type</span>
-                                <span className="caller-summary-value">{submitted.type?.replace(/_/g, " ")}</span>
+                        <div className="caller-summary-light">
+                            <div className="caller-row">
+                                <span className="caller-row-label">Type</span>
+                                <span className="caller-row-value">{submitted.type?.replace(/_/g, " ")}</span>
                             </div>
-                            <div className="caller-summary-row">
-                                <span className="caller-summary-label">Location</span>
-                                <span className="caller-summary-value">{submitted.location}</span>
+                            <div className="caller-row">
+                                <span className="caller-row-label">Location</span>
+                                <span className="caller-row-value">{submitted.location}</span>
                             </div>
-                            <div className="caller-summary-row">
-                                <span className="caller-summary-label">Priority</span>
-                                <span className={`caller-priority caller-priority-${submitted.risk_level}`}>
+                            <div className="caller-row">
+                                <span className="caller-row-label">Priority</span>
+                                <span className={`caller-pri caller-pri-${submitted.risk_level}`}>
                                     {submitted.triage?.priority ?? "—"}
                                 </span>
                             </div>
                             {lastText && (
-                                <div className="caller-summary-row caller-summary-transcript">
-                                    <span className="caller-summary-label">Transcript</span>
-                                    <span className="caller-summary-value">"{lastText}"</span>
+                                <div className="caller-row caller-row-transcript">
+                                    <span className="caller-row-label">Transcript</span>
+                                    <span className="caller-row-value">&ldquo;{lastText}&rdquo;</span>
                                 </div>
                             )}
                         </div>
 
-                        <button className="caller-btn caller-btn-new" onClick={handleNewReport}>
+                        <button className="caller-btn-light" onClick={handleNewReport}>
                             Report Another Incident
                         </button>
                     </div>
                 ) : (
                     <>
-                        {/* Recording area */}
-                        <div className="caller-record-area">
-                            <p className="caller-instruction">
-                                Tap the microphone and describe the incident.<br />
-                                Include the <strong>type</strong>, <strong>location</strong>, and <strong>severity</strong>.
-                            </p>
+                        {/* Prompt */}
+                        <h1 className="caller-heading">
+                            How can we help? Please <span className="caller-accent">tap the microphone</span> below and describe the situation.
+                        </h1>
 
+                        <p className="caller-categories">
+                            <span>📍 Where</span>
+                            <span className="caller-dot">•</span>
+                            <span>🔥 What</span>
+                            <span className="caller-dot">•</span>
+                            <span>🚑 Injuries</span>
+                        </p>
+
+                        {/* Mic button */}
+                        <div className="caller-mic-wrapper">
                             <button
-                                className={`caller-mic-btn ${state}`}
+                                className={`caller-mic-light ${state}`}
                                 onClick={handleClick}
                                 disabled={state === "processing"}
                             >
                                 {state === "processing" ? (
-                                    <span className="vr-spinner" />
+                                    <span className="caller-spinner" />
                                 ) : state === "recording" ? (
-                                    <svg viewBox="0 0 24 24" fill="currentColor" className="caller-mic-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" className="caller-mic-svg">
                                         <rect x="6" y="6" width="12" height="12" rx="2" />
                                     </svg>
                                 ) : (
-                                    <svg viewBox="0 0 24 24" fill="currentColor" className="caller-mic-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" className="caller-mic-svg">
                                         <path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v7a2 2 0 1 0 4 0V5a2 2 0 0 0-2-2zm-7 9a7 7 0 0 0 14 0h2a9 9 0 0 1-8 8.94V23h-2v-2.06A9 9 0 0 1 3 12h2z" />
                                     </svg>
                                 )}
                             </button>
-
-                            <p className="caller-status-label">
-                                {state === "idle" && "Tap to start recording"}
-                                {state === "recording" && (
-                                    <span className="caller-recording-label">
-                                        <span className="vr-dot" /> Recording… tap to stop
-                                    </span>
-                                )}
-                                {state === "processing" && "Transcribing & classifying…"}
-                            </p>
                         </div>
+
+                        <p className="caller-tap-label">
+                            {state === "idle" && "Tap to start speaking"}
+                            {state === "recording" && (
+                                <span className="caller-rec-label">
+                                    <span className="caller-rec-dot" /> Recording… tap to stop
+                                </span>
+                            )}
+                            {state === "processing" && "Analysing your report…"}
+                        </p>
 
                         {/* Error */}
                         {error && (
-                            <div className="caller-error">
-                                <span>⚠</span> {error}
+                            <div className="caller-error-light">
+                                <strong>Oops!</strong> {error}
                             </div>
                         )}
 
-                        {/* Tips */}
-                        <div className="caller-tips">
-                            <p className="caller-tips-title">Tips for best results</p>
+                        {/* Helpful Tips */}
+                        <div className="caller-tips-light">
+                            <p className="caller-tips-heading">💡 <strong>Helpful Tips</strong></p>
                             <ul>
-                                <li>Speak clearly and include the incident type, location, and severity</li>
-                                <li>Example: <em>"There is a fire at Block 45, Toa Payoh Lorong 5, smoke visible from 4th floor"</em></li>
-                                <li>Keep recordings under 2 minutes for fastest processing</li>
+                                <li>
+                                    <span className="caller-check">✓</span>
+                                    Be specific about your location (block number, street, nearby landmarks).
+                                </li>
+                                <li>
+                                    <span className="caller-check">✓</span>
+                                    Describe clearly what you see (e.g., &ldquo;I see smoke from the 4th floor&rdquo;).
+                                </li>
+                                <li>
+                                    <span className="caller-check">✓</span>
+                                    Mention if anyone needs medical assistance immediately.
+                                </li>
                             </ul>
                         </div>
                     </>
                 )}
             </main>
-
-            <footer className="caller-footer">
-                <p>For life-threatening emergencies, call <strong>995</strong> (SCDF) or <strong>999</strong> (SPF)</p>
-            </footer>
         </div>
     );
 }

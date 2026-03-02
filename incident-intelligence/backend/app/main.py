@@ -359,7 +359,49 @@ async def get_reports():
 
 @app.post("/api/reports")
 async def add_report(report: dict):
-    """Accept a new incoming report from the caller site."""
+    """Accept a new incoming report from the caller site.
+
+    If the report matches an existing active incident (same type + similar
+    location), append the information to that incident's timeline instead
+    of creating a duplicate.  Otherwise add it as a new incoming report.
+    """
+    report_type = (report.get("type") or "").lower().strip()
+    report_loc = (report.get("location") or "").lower().strip()
+
+    # --- Check for matching active incident ---
+    matched_incident = None
+    for inc in _active_incidents:
+        inc_type = (inc.get("type") or "").lower().strip()
+        inc_loc = (inc.get("location") or "").lower().strip()
+
+        # Match if same incident type AND location overlap
+        if inc_type and report_type and inc_type == report_type:
+            # Fuzzy location check: either contains the other
+            if (
+                inc_loc in report_loc
+                or report_loc in inc_loc
+                or inc_loc == report_loc
+            ):
+                matched_incident = inc
+                break
+
+    if matched_incident:
+        # Append as a new timeline entry on the existing incident
+        entry = {
+            "time": datetime.now(timezone.utc).isoformat(),
+            "type": "report",
+            "description": f"Additional report: {report.get('text', '')}",
+            "speaker": report.get("source", "caller"),
+        }
+        matched_incident.setdefault("timeline", []).append(entry)
+        return {
+            "status": "merged",
+            "id": report.get("id"),
+            "matched_incident_id": matched_incident["id"],
+            "message": "Report merged into existing active incident",
+        }
+
+    # --- No match → add as new incoming report ---
     _incoming_reports.insert(0, report)
     return {"status": "ok", "id": report.get("id")}
 
