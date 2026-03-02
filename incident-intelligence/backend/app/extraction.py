@@ -20,28 +20,62 @@ _TYPE_KEYWORDS: Dict[str, List[str]] = {
         "heart attack", "cardiac", "seizure", "fainted", "collapse", "overdose",
         "choking", "fracture", "broken bone", "burn", "wound", "trauma",
         "breathing difficulty", "chest pain", "stroke", "allergic reaction",
+        # Natural speech
+        "someone got hurt", "someone is hurt", "person down", "man down",
+        "not breathing", "can't breathe", "passed out", "fell down",
+        "needs help", "need an ambulance", "call ambulance", "send ambulance",
+        "having a heart attack", "having a stroke", "broken leg", "broken arm",
+        "in pain", "badly hurt", "seriously hurt", "head injury",
+        "lying on the ground", "on the floor", "not moving", "not responding",
     ],
     "fire_smoke": [
         "fire", "smoke", "burning", "flames", "blaze", "arson", "explosion",
         "exploded", "gas leak", "chemical spill", "hazmat", "inferno",
+        # Natural speech
+        "on fire", "there's a fire", "building is burning", "I can see smoke",
+        "see flames", "smell smoke", "something is burning", "the fire",
+        "fire alarm", "fire engine", "call the fire department",
+        "smoke coming from", "smoke everywhere", "thick smoke",
     ],
     "violence_conflict": [
         "fight", "fighting", "assault", "attacked", "stabbed", "stabbing",
         "shot", "shooting", "punch", "punched", "brawl", "domestic violence",
         "battery", "hit", "beaten", "hostage", "robbery", "mugging",
+        # Natural speech
+        "gonna kill", "going to kill", "trying to kill", "killed someone",
+        "someone got stabbed", "someone got shot", "people fighting",
+        "beating someone up", "attacking someone", "chasing someone",
+        "pulling a knife", "has a knife", "with a knife", "threatening",
+        "being robbed", "getting mugged", "someone stole", "break in",
+        "breaking in", "slashing", "slashed",
     ],
     "suspicious_person": [
         "suspicious", "lurking", "stalking", "loitering", "trespassing",
         "peeping", "following", "prowler", "watching", "casing",
+        # Natural speech
+        "suspicious person", "strange man", "strange person", "weird guy",
+        "someone suspicious", "acting strange", "acting weird",
+        "following me", "following someone", "watching me",
+        "creepy", "peeping tom", "left a bag", "unattended bag",
+        "suspicious package", "abandoned bag",
     ],
     "crowd_risk": [
         "crowd", "stampede", "overcrowding", "gathering", "riot", "protest",
         "mob", "unruly crowd", "crowd surge", "mosh", "panic",
+        # Natural speech
+        "too many people", "people pushing", "getting crushed",
+        "people panicking", "everyone running", "people screaming",
+        "big crowd", "huge crowd", "out of control",
     ],
     "traffic_accident": [
         "accident", "crash", "collision", "hit and run", "vehicle",
         "car crash", "motorcycle", "pedestrian hit", "road", "traffic",
         "pile-up", "rollover", "overturned",
+        # Natural speech
+        "car accident", "been a crash", "there's been an accident",
+        "car hit", "got hit by a car", "knocked down", "run over",
+        "bus accident", "lorry", "truck accident", "bike accident",
+        "road accident", "traffic accident", "fender bender",
     ],
 }
 
@@ -49,18 +83,25 @@ _WEAPON_KEYWORDS = [
     "knife", "gun", "firearm", "pistol", "rifle", "weapon", "machete",
     "sword", "bat", "axe", "hammer", "explosive", "bomb", "grenade",
     "blade", "armed",
+    # Natural speech
+    "has a knife", "with a knife", "pulled a knife", "pulled a gun",
+    "holding a weapon", "carrying a weapon", "sharp object",
+    "parang", "chopper", "cleaver",
 ]
 
 _AGGRESSION_KEYWORDS_HIGH = [
     "attacking", "rampage", "killing", "murder", "threatening to kill",
     "active shooter", "hostage", "brandishing",
+    "gonna kill", "going to kill", "trying to kill", "slashing people",
 ]
 _AGGRESSION_KEYWORDS_MED = [
     "threatening", "aggressive", "violent", "hostile", "confrontation",
     "intimidating", "yelling", "screaming",
+    "chasing", "cornered", "won't let me leave", "blocking the exit",
 ]
 _AGGRESSION_KEYWORDS_LOW = [
     "argument", "dispute", "quarrel", "shouting", "pushing",
+    "heated", "angry", "upset", "agitated", "raising voice",
 ]
 
 _INTOXICATION_KEYWORDS = [
@@ -73,6 +114,11 @@ _FIRE_KEYWORDS = ["fire", "smoke", "flames", "burning", "blaze", "inferno"]
 _INJURY_KEYWORDS = [
     "injured", "injury", "bleeding", "wound", "hurt", "casualty",
     "casualties", "victim", "unconscious", "dead", "killed",
+    # Natural speech
+    "someone got hurt", "people hurt", "badly hurt", "seriously hurt",
+    "blood everywhere", "covered in blood", "need medical",
+    "not moving", "not breathing", "passed out", "on the ground",
+    "broken", "fractured", "in pain", "screaming in pain",
 ]
 
 # ---------------------------------------------------------------------------
@@ -80,9 +126,21 @@ _INJURY_KEYWORDS = [
 # ---------------------------------------------------------------------------
 
 _PEOPLE_RE = re.compile(
-    r"(\d+)\s*(?:people|persons|individuals|victims|casualties|injured|men|women|children|kids|bystanders)",
+    r"(\d+)\s*(?:people|persons|individuals|victims|casualties|injured|men|women|children|kids|bystanders|guys|persons)",
     re.IGNORECASE,
 )
+
+# Match spoken number words and vague counts
+_SPOKEN_COUNT_MAP = {
+    "a person": 1, "one person": 1, "a man": 1, "a woman": 1,
+    "a guy": 1, "someone": 1, "one guy": 1, "one man": 1,
+    "two people": 2, "two men": 2, "two guys": 2, "two persons": 2,
+    "three people": 3, "three men": 3, "three guys": 3,
+    "four people": 4, "five people": 5, "six people": 6,
+    "a few people": 3, "a few guys": 3, "several people": 4,
+    "a group of people": 8, "a group": 8, "many people": 15,
+    "a lot of people": 20, "lots of people": 20,
+}
 
 # ---------------------------------------------------------------------------
 # Singapore location keywords for extraction
@@ -180,8 +238,18 @@ def extract_incident_features(
             if candidate and candidate[0].isupper() and len(candidate) > 2:
                 location = candidate
 
-    people_match = _PEOPLE_RE.search(text)
-    people_count = int(people_match.group(1)) if people_match else None
+    people_count = None
+    for phrase, count in _SPOKEN_COUNT_MAP.items():
+        if phrase in text_lower:
+            # Take the largest match if we wanted to be rigorous, but a simple 
+            # find is usually good enough for these short reports.
+            people_count = count
+            break
+
+    if people_count is None:
+        people_match = _PEOPLE_RE.search(text)
+        if people_match:
+            people_count = int(people_match.group(1))
 
     injuries_present = _has_any(text, _INJURY_KEYWORDS)
     weapon_mentioned = _has_any(text, _WEAPON_KEYWORDS)
