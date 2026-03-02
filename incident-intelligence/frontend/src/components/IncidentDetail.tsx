@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Incident, SimilarCase } from "../types";
-import { updateIncidentStatus } from "../api";
+import { updateActiveStatus } from "../api";
 
 interface Props {
     incident: Incident;
@@ -29,7 +29,7 @@ export default function IncidentDetail({
         setUpdating(status);
         setError(null);
         try {
-            await updateIncidentStatus(incident.id, status);
+            await updateActiveStatus(incident.id, status);
             onStatusUpdated();
         } catch (e: any) {
             setError(e.message);

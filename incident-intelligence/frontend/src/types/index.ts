@@ -1,5 +1,7 @@
 /** IntelResponse – Shared TypeScript types. */
 
+// ---- Existing types (kept for legacy endpoints) ----
+
 export interface KeyEntities {
     location: string | null;
     people_count: number | null;
@@ -57,4 +59,44 @@ export interface Incident {
     outcome: string | null;
     response_taken: string | null;
     status: string;
+}
+
+// ---- Dispatch workflow types ----
+
+export interface IncomingReport {
+    id: string;
+    text: string;
+    location: string;
+    type: string;
+    risk_level: string; // critical | high | medium | low
+    confidence: number;
+    source: string; // hotline | citizen
+    time: string;
+    extracted_features: Structured | null;
+    triage: Triage | null;
+    recommended: Recommended | null;
+}
+
+export interface TimelineEvent {
+    time: string;
+    type: string; // report | dispatch | radio | escalation | update | resolved
+    description: string;
+}
+
+export interface Responder {
+    name: string;
+    role: string;
+    unit: string;
+}
+
+export interface ActiveIncident {
+    id: string;
+    summary: string;
+    location: string;
+    priority: string;
+    status: string; // deploying | active | resolved
+    type: string;
+    responders: Responder[];
+    timeline: TimelineEvent[];
+    extracted_features: Structured | null;
 }

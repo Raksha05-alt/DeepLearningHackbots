@@ -839,6 +839,332 @@ body {
   color: var(--accent);
 }
 
+/* ---- Tab Navigation ---- */
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: rgba(88, 166, 255, 0.05);
+}
+
+.tab-icon {
+  font-size: 1rem;
+}
+
+.tab-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--bg-tertiary);
+  padding: 1px 6px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+}
+
+.tab-btn.active .tab-count {
+  background: var(--accent-dim);
+  color: white;
+}
+
+/* ---- Card extras ---- */
+.card-footer-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.confidence-badge {
+  background: rgba(88, 166, 255, 0.1);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.68rem;
+}
+
+.card-status-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+  text-transform: uppercase;
+}
+
+.responder-count,
+.timeline-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.empty-queue {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-queue span {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.3;
+}
+
+.empty-queue p {
+  font-size: 0.85rem;
+}
+
+/* ---- Overview Grid ---- */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.status-value {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ---- Timeline ---- */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.timeline-entry {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.timeline-entry:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -28px;
+  top: 12px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.timeline-content {
+  flex: 1;
+  background: var(--bg-tertiary);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.timeline-type {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.timeline-dispatch .timeline-type {
+  color: var(--danger);
+}
+
+.timeline-radio .timeline-type {
+  color: var(--warning);
+}
+
+.timeline-resolved .timeline-type {
+  color: var(--success);
+}
+
+.timeline-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.timeline-desc {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* ---- Responders ---- */
+.responders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.responder-card {
+  background: var(--bg-tertiary);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+
+.responder-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.responder-role {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.responder-unit {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.no-responders {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius);
+}
+
+/* ---- Current Status ---- */
+.current-status {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+/* ---- Report Actions ---- */
+.report-actions {
+  display: flex;
+  gap: 10px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+.btn-create-incident {
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  font-size: 0.85rem;
+  padding: 10px 20px;
+}
+
+.btn-create-incident:hover:not(:disabled) {
+  background: rgba(88, 166, 255, 0.25);
+}
+
+.btn-request-info {
+  background: rgba(210, 153, 34, 0.15);
+  color: var(--warning);
+  border: 1px solid rgba(210, 153, 34, 0.3);
+}
+
+.btn-request-info:hover:not(:disabled) {
+  background: rgba(210, 153, 34, 0.25);
+}
+
+.btn-dismiss {
+  background: rgba(139, 148, 158, 0.15);
+  color: var(--text-secondary);
+  border: 1px solid rgba(139, 148, 158, 0.3);
+}
+
+.btn-dismiss:hover:not(:disabled) {
+  background: rgba(139, 148, 158, 0.25);
+}
+
+.btn-status-active {
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+}
+
+.btn-status-active:hover:not(:disabled) {
+  background: rgba(88, 166, 255, 0.25);
+}
+
+/* ---- Missing List ---- */
+.missing-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.missing-item {
+  background: rgba(210, 153, 34, 0.08);
+  border: 1px solid rgba(210, 153, 34, 0.15);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  color: var(--warning);
+}
+
+.missing-item::before {
+  content: "⚠ ";
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 900px) {
   .sidebar {

@@ -1,25 +1,59 @@
-/** IntelResponse – API fetch helpers. */
+/** IntelResponse – API fetch helpers (dispatch workflow). */
 
 import { API_BASE } from "./config";
-import type { Incident } from "./types";
+import type { IncomingReport, ActiveIncident } from "./types";
 
-export async function fetchIncidents(): Promise<Incident[]> {
-    const res = await fetch(`${API_BASE}/incidents`);
+// ---- Incoming Reports ----
+
+export async function fetchReports(): Promise<IncomingReport[]> {
+    const res = await fetch(`${API_BASE}/api/reports`);
+    if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`);
+    return res.json();
+}
+
+// ---- Active Incidents ----
+
+export async function fetchActiveIncidents(): Promise<ActiveIncident[]> {
+    const res = await fetch(`${API_BASE}/api/incidents`);
     if (!res.ok) throw new Error(`Failed to fetch incidents: ${res.status}`);
     return res.json();
 }
 
-export async function fetchIncident(id: string): Promise<Incident> {
-    const res = await fetch(`${API_BASE}/incidents/${id}`);
-    if (!res.ok) throw new Error(`Failed to fetch incident: ${res.status}`);
+// ---- Promote report → incident ----
+
+export async function createFromReport(reportId: string): Promise<ActiveIncident> {
+    const res = await fetch(`${API_BASE}/api/incidents/create_from_report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ report_id: reportId }),
+    });
+    if (!res.ok) throw new Error(`Failed to create incident: ${res.status}`);
     return res.json();
 }
 
-export async function updateIncidentStatus(
-    id: string,
+// ---- Timeline ----
+
+export async function addTimelineEntry(
+    incidentId: string,
+    type: string,
+    description: string
+): Promise<ActiveIncident> {
+    const res = await fetch(`${API_BASE}/api/incidents/${incidentId}/timeline`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, description }),
+    });
+    if (!res.ok) throw new Error(`Failed to add timeline entry: ${res.status}`);
+    return res.json();
+}
+
+// ---- Update status ----
+
+export async function updateActiveStatus(
+    incidentId: string,
     status: string
-): Promise<Incident> {
-    const res = await fetch(`${API_BASE}/incidents/${id}/status`, {
+): Promise<ActiveIncident> {
+    const res = await fetch(`${API_BASE}/api/incidents/${incidentId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -28,12 +62,5 @@ export async function updateIncidentStatus(
     return res.json();
 }
 
-export async function fetchStats(): Promise<{
-    total_incidents: number;
-    by_outcome: Record<string, number>;
-    by_incident_type: Record<string, number>;
-}> {
-    const res = await fetch(`${API_BASE}/stats`);
-    if (!res.ok) throw new Error(`Failed to fetch stats: ${res.status}`);
-    return res.json();
-}
+// ---- Dismiss report (remove from list client-side) ----
+// No backend endpoint needed — just filter locally
