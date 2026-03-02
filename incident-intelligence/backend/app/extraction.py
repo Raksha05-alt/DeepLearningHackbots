@@ -84,6 +84,33 @@ _PEOPLE_RE = re.compile(
     re.IGNORECASE,
 )
 
+# ---------------------------------------------------------------------------
+# Singapore location keywords for extraction
+# ---------------------------------------------------------------------------
+
+_SG_LOCATIONS = [
+    "Ang Mo Kio", "Bedok", "Bishan", "Bukit Batok", "Bukit Merah",
+    "Bukit Panjang", "Bukit Timah", "Choa Chu Kang", "Clementi",
+    "Geylang", "Hougang", "Jurong East", "Jurong West", "Kallang",
+    "Marine Parade", "Pasir Ris", "Punggol", "Queenstown", "Sembawang",
+    "Sengkang", "Serangoon", "Tampines", "Toa Payoh", "Woodlands",
+    "Yishun", "Changi", "Sentosa", "Marina Bay", "Orchard", "Clarke Quay",
+    "Chinatown", "Little India", "Lavender", "Bugis", "City Hall",
+    "Raffles Place", "Tanjong Pagar", "Tiong Bahru", "Novena",
+    "Newton", "Dhoby Ghaut", "Somerset", "Bayfront", "Harbourfront",
+    "Outram Park", "Boon Lay", "Pioneer", "Dover", "Holland Village",
+    "Paya Lebar", "Aljunied", "Eunos", "Kembangan", "Simei",
+    "Tanah Merah", "Expo", "East Coast Park", "West Coast",
+    "Upper Thomson", "Braddell", "Potong Pasir", "Bartley",
+    "Mountbatten", "Stadium", "Promenade", "Esplanade",
+    "Fort Canning", "Rochor", "Bencoolen", "Bras Basah",
+]
+
+_LOCATION_RE = re.compile(
+    r"(?:at|near|in|around|outside|opposite)\s+(.+?)(?:\.|,|$)",
+    re.IGNORECASE,
+)
+
 
 def _has_any(text: str, keywords: List[str]) -> bool:
     """Return True if *text* contains any of the *keywords* (case-insensitive)."""
@@ -135,7 +162,23 @@ def extract_incident_features(
         incident_type = "other"
 
     # ---- Key entities ---------------------------------------------------
+
+    # Location: prefer explicit hint, then known SG place names, then regex
     location = location_hint if location_hint else None
+    if not location:
+        # Search for known Singapore locations in the text (case-insensitive)
+        for sg_loc in sorted(_SG_LOCATIONS, key=len, reverse=True):
+            if sg_loc.lower() in text_lower:
+                location = sg_loc
+                break
+    if not location:
+        # Fallback: try "at/near/in <location>" pattern
+        loc_match = _LOCATION_RE.search(text)
+        if loc_match:
+            candidate = loc_match.group(1).strip()
+            # Only accept if it looks like a proper noun (starts with uppercase)
+            if candidate and candidate[0].isupper() and len(candidate) > 2:
+                location = candidate
 
     people_match = _PEOPLE_RE.search(text)
     people_count = int(people_match.group(1)) if people_match else None
