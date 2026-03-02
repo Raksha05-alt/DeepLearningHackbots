@@ -29,7 +29,15 @@ export default function CallerApp() {
         setSubmitted(null);
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream);
+
+            // Prefer formats that Whisper handles best
+            const mimeType = MediaRecorder.isTypeSupported("audio/mp4")
+                ? "audio/mp4"
+                : MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+                    ? "audio/webm;codecs=opus"
+                    : "audio/webm";
+
+            const mediaRecorder = new MediaRecorder(stream, { mimeType });
             chunksRef.current = [];
 
             mediaRecorder.ondataavailable = (e) => {
@@ -38,7 +46,8 @@ export default function CallerApp() {
 
             mediaRecorder.onstop = async () => {
                 stream.getTracks().forEach((t) => t.stop());
-                const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+                const ext = mimeType.includes("mp4") ? "audio/mp4" : "audio/webm";
+                const blob = new Blob(chunksRef.current, { type: ext });
                 setState("processing");
                 try {
                     const result = await transcribeAudio(blob, "en");
