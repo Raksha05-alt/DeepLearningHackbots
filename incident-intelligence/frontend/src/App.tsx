@@ -1,15 +1,15 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
     ReportCard,
     ReportDetail,
     ActiveIncidentCard,
     ActiveIncidentDetail,
-    VoiceRecorder,
 } from "./components";
 import { fetchReports, fetchActiveIncidents, createFromReport } from "./api";
 import type { IncomingReport, ActiveIncident } from "./types";
 
-type Tab = "reports" | "incidents" | "record";
+type Tab = "reports" | "incidents";
+const TABS: Tab[] = ["reports", "incidents"];
 
 function App() {
     const [activeTab, setActiveTab] = useState<Tab>("reports");
@@ -26,6 +26,10 @@ function App() {
     const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
     const [incidentsLoading, setIncidentsLoading] = useState(true);
     const [incidentsError, setIncidentsError] = useState<string | null>(null);
+
+    // ---- Swipe state ----
+    const touchStartX = useRef<number | null>(null);
+    const swiping = useRef(false);
 
     // ---- Load reports ----
     const loadReports = useCallback(async () => {
@@ -61,9 +65,31 @@ function App() {
         }
     }, []);
 
+    // ---- Initial load + auto-poll every 5s ----
     useEffect(() => {
         loadReports();
         loadIncidents();
+
+        const pollInterval = setInterval(() => {
+            fetchReports()
+                .then((data) => {
+                    setReports(data);
+                    if (data.length > 0) {
+                        setSelectedReportId((prev) => prev ?? data[0].id);
+                    }
+                })
+                .catch(() => { });
+            fetchActiveIncidents()
+                .then((data) => {
+                    setIncidents(data);
+                    if (data.length > 0) {
+                        setSelectedIncidentId((prev) => prev ?? data[0].id);
+                    }
+                })
+                .catch(() => { });
+        }, 5000);
+
+        return () => clearInterval(pollInterval);
     }, [loadReports, loadIncidents]);
 
     // ---- Create incident from report ----
@@ -71,10 +97,8 @@ function App() {
         setCreating(true);
         try {
             await createFromReport(reportId);
-            // Switch to incidents tab and refresh both
             await Promise.all([loadReports(), loadIncidents()]);
             setActiveTab("incidents");
-            // Select the new incident (it's first in the list)
             const updatedIncidents = await fetchActiveIncidents();
             if (updatedIncidents.length > 0) {
                 setSelectedIncidentId(updatedIncidents[0].id);
@@ -95,19 +119,39 @@ function App() {
         }
     };
 
-    // ---- Voice report received ----
-    const handleVoiceReport = (report: IncomingReport) => {
-        setReports((prev) => [report, ...prev]);
-        setSelectedReportId(report.id);
-        // Switch to the reports tab so the user can see and triage the result
-        setActiveTab("reports");
+    // ---- Swipe handlers ----
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+        swiping.current = true;
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (!swiping.current || touchStartX.current === null) return;
+        const diff = e.changedTouches[0].clientX - touchStartX.current;
+        const threshold = 60;
+        if (Math.abs(diff) > threshold) {
+            const currentIdx = TABS.indexOf(activeTab);
+            if (diff < 0 && currentIdx < TABS.length - 1) {
+                // swipe left → next tab
+                setActiveTab(TABS[currentIdx + 1]);
+            } else if (diff > 0 && currentIdx > 0) {
+                // swipe right → previous tab
+                setActiveTab(TABS[currentIdx - 1]);
+            }
+        }
+        touchStartX.current = null;
+        swiping.current = false;
     };
 
     const selectedReport = reports.find((r) => r.id === selectedReportId) ?? null;
     const selectedIncident = incidents.find((i) => i.id === selectedIncidentId) ?? null;
 
     return (
-        <div className="app-layout">
+        <div
+            className="app-layout"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+        >
             {/* ---- Sidebar ---- */}
             <aside className="sidebar">
                 <div className="sidebar-header">
@@ -134,14 +178,6 @@ function App() {
                         <span className="tab-icon">🚨</span>
                         Active
                         <span className="tab-count">{incidents.length}</span>
-                    </button>
-                    <button
-                        className={`tab-btn tab-btn-record ${activeTab === "record" ? "active" : ""}`}
-                        onClick={() => setActiveTab("record")}
-                        id="voice-tab-btn"
-                    >
-                        <span className="tab-icon">🎙️</span>
-                        Record
                     </button>
                 </div>
 
@@ -222,13 +258,6 @@ function App() {
                         </div>
                     </>
                 )}
-
-                {/* ---- Tab Content: Record ---- */}
-                {activeTab === "record" && (
-                    <div className="incident-queue">
-                        <VoiceRecorder onResult={handleVoiceReport} />
-                    </div>
-                )}
             </aside>
 
             {/* ---- Main Content ---- */}
@@ -245,16 +274,6 @@ function App() {
                         incident={selectedIncident}
                         onUpdated={() => loadIncidents()}
                     />
-                ) : activeTab === "record" ? (
-                    <div className="empty-state">
-                        <span className="empty-icon" style={{ opacity: 1, fontSize: "4rem" }}>🎙️</span>
-                        <h2 style={{ color: "var(--text-primary)", fontSize: "1.4rem", marginBottom: "8px" }}>
-                            Voice-to-Incident
-                        </h2>
-                        <p style={{ color: "var(--text-secondary)", maxWidth: "380px", textAlign: "center", lineHeight: 1.6 }}>
-                            Record an incident report on the left. OpenAI Whisper will transcribe it and automatically classify it — then it appears in your Incoming queue ready for triage.
-                        </p>
-                    </div>
                 ) : (
                     <div className="empty-state">
                         <span className="empty-icon">🛡️</span>

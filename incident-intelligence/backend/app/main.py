@@ -357,6 +357,13 @@ async def get_reports():
     return _incoming_reports
 
 
+@app.post("/api/reports")
+async def add_report(report: dict):
+    """Accept a new incoming report from the caller site."""
+    _incoming_reports.insert(0, report)
+    return {"status": "ok", "id": report.get("id")}
+
+
 @app.get("/api/reports/{report_id}")
 async def get_report(report_id: str):
     """Return a single incoming report."""
