@@ -78,7 +78,9 @@ export async function transcribeAudio(
     language = "en"
 ): Promise<TranscribeResult> {
     const form = new FormData();
-    form.append("file", audioBlob, "recording.webm");
+    // Use the correct extension based on the blob type we captured
+    const ext = audioBlob.type.includes("mp4") ? "mp4" : "webm";
+    form.append("file", audioBlob, `recording.${ext}`);
 
     const res = await fetch(`${API_BASE}/api/transcribe?language=${language}`, {
         method: "POST",
