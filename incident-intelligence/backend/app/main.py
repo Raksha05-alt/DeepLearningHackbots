@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 import uuid
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -26,6 +26,7 @@ from .scoring import compute_triage_score
 from .similarity import get_similar_cases
 from .recommendations import recommend_response
 from .seed import seed_if_empty
+from .transcription import TranscriptionError, transcribe_audio_bytes
 
 # ---------------------------------------------------------------------------
 # In-memory stores for the dispatch workflow
@@ -411,6 +412,71 @@ async def create_from_report(body: CreateFromReport):
     _active_incidents.insert(0, incident)
 
     return incident
+
+
+# ---------------------------------------------------------------------------
+# Speech-to-Text endpoint
+# ---------------------------------------------------------------------------
+
+
+@app.post("/api/transcribe")
+async def transcribe_audio_endpoint(
+    file: UploadFile = File(..., description="Audio file to transcribe (mp3, wav, m4a, webm, ogg, flac…)"),
+    language: str = Query(default="en", description="ISO-639-1 language code, e.g. 'en', 'zh', 'ms'. Pass 'auto' to let Whisper detect."),
+) -> dict:
+    """
+    Transcribe an uploaded audio file using OpenAI Whisper, then pipe the
+    resulting text through the incident feature-extraction pipeline.
+
+    **Request** (multipart/form-data)
+    - `file`     – audio file (mp3 / wav / m4a / webm / ogg / flac)
+    - `language` – ISO-639-1 code (default: "en"). Pass "auto" for auto-detect.
+
+    **Response 200**
+    ```json
+    {
+      "transcription":       "Man with knife at Orchard MRT…",
+      "language":            "en",
+      "extracted_features":  { … }
+    }
+    ```
+
+    **Error codes**
+    - 400 – bad audio (empty, silent, corrupt, unsupported format)
+    - 401 – invalid / missing OpenAI API key
+    - 429 – OpenAI rate limit exceeded
+    - 503 – cannot reach OpenAI API
+    """
+    audio_bytes = await file.read()
+    lang = None if language.lower() == "auto" else language
+
+    try:
+        result = transcribe_audio_bytes(
+            audio_bytes=audio_bytes,
+            filename=file.filename or "upload.wav",
+            language=lang,
+        )
+    except TranscriptionError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected transcription error: {exc}",
+        ) from exc
+
+    # Pipe transcription through the incident feature-extraction pipeline
+    extracted = extract_incident_features(
+        report_text=result["text"],
+        location_hint=None,
+    )
+
+    return {
+        "transcription": result["text"],
+        "language": result["language"],
+        "extracted_features": extracted,
+    }
 
 
 class TimelineEntry(BaseModel):

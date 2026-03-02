@@ -59,7 +59,11 @@ export default function ReportCard({ report, selected, onClick }: Props) {
                     <span className="type-label">
                         {report.type.replace(/_/g, " ")}
                     </span>
-                    <span className="card-source">{report.source}</span>
+                    {report.source === "voice" ? (
+                        <span className="card-source-voice">🎙 VOICE</span>
+                    ) : (
+                        <span className="card-source">{report.source}</span>
+                    )}
                 </div>
                 <div className="card-location">📍 {report.location}</div>
                 <p className="card-preview">{report.text.slice(0, 100)}…</p>

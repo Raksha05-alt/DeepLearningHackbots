@@ -4,3 +4,4 @@ export { default as ReportCard } from "./ReportCard";
 export { default as ReportDetail } from "./ReportDetail";
 export { default as ActiveIncidentCard } from "./ActiveIncidentCard";
 export { default as ActiveIncidentDetail } from "./ActiveIncidentDetail";
+export { default as VoiceRecorder } from "./VoiceRecorder";

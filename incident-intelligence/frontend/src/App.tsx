@@ -4,11 +4,12 @@ import {
     ReportDetail,
     ActiveIncidentCard,
     ActiveIncidentDetail,
+    VoiceRecorder,
 } from "./components";
 import { fetchReports, fetchActiveIncidents, createFromReport } from "./api";
 import type { IncomingReport, ActiveIncident } from "./types";
 
-type Tab = "reports" | "incidents";
+type Tab = "reports" | "incidents" | "record";
 
 function App() {
     const [activeTab, setActiveTab] = useState<Tab>("reports");
@@ -94,6 +95,14 @@ function App() {
         }
     };
 
+    // ---- Voice report received ----
+    const handleVoiceReport = (report: IncomingReport) => {
+        setReports((prev) => [report, ...prev]);
+        setSelectedReportId(report.id);
+        // Switch to the reports tab so the user can see and triage the result
+        setActiveTab("reports");
+    };
+
     const selectedReport = reports.find((r) => r.id === selectedReportId) ?? null;
     const selectedIncident = incidents.find((i) => i.id === selectedIncidentId) ?? null;
 
@@ -125,6 +134,14 @@ function App() {
                         <span className="tab-icon">🚨</span>
                         Active
                         <span className="tab-count">{incidents.length}</span>
+                    </button>
+                    <button
+                        className={`tab-btn tab-btn-record ${activeTab === "record" ? "active" : ""}`}
+                        onClick={() => setActiveTab("record")}
+                        id="voice-tab-btn"
+                    >
+                        <span className="tab-icon">🎙️</span>
+                        Record
                     </button>
                 </div>
 
@@ -205,6 +222,13 @@ function App() {
                         </div>
                     </>
                 )}
+
+                {/* ---- Tab Content: Record ---- */}
+                {activeTab === "record" && (
+                    <div className="incident-queue">
+                        <VoiceRecorder onResult={handleVoiceReport} />
+                    </div>
+                )}
             </aside>
 
             {/* ---- Main Content ---- */}
@@ -221,6 +245,16 @@ function App() {
                         incident={selectedIncident}
                         onUpdated={() => loadIncidents()}
                     />
+                ) : activeTab === "record" ? (
+                    <div className="empty-state">
+                        <span className="empty-icon" style={{ opacity: 1, fontSize: "4rem" }}>🎙️</span>
+                        <h2 style={{ color: "var(--text-primary)", fontSize: "1.4rem", marginBottom: "8px" }}>
+                            Voice-to-Incident
+                        </h2>
+                        <p style={{ color: "var(--text-secondary)", maxWidth: "380px", textAlign: "center", lineHeight: 1.6 }}>
+                            Record an incident report on the left. OpenAI Whisper will transcribe it and automatically classify it — then it appears in your Incoming queue ready for triage.
+                        </p>
+                    </div>
                 ) : (
                     <div className="empty-state">
                         <span className="empty-icon">🛡️</span>

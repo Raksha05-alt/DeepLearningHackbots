@@ -1,14 +1,38 @@
-/** IntelResponse – Report detail panel for Incoming Reports tab. */
+/** IntelResponse – Report detail panel for Incoming Reports tab.
+ *  Language simplified for members of the public.
+ */
 
 import { useState } from "react";
 import type { IncomingReport } from "../types";
 
-const ACTION_STYLES: Record<string, { color: string; label: string }> = {
-    dispatch_now: { color: "var(--priority-p0)", label: "🚨 DISPATCH NOW" },
-    dispatch_soon: { color: "var(--priority-p1)", label: "🔔 DISPATCH SOON" },
-    monitor: { color: "var(--priority-p2)", label: "👁️ MONITOR" },
-    request_more_info: { color: "var(--priority-p3)", label: "❓ REQUEST MORE INFO" },
+// Maps internal action codes → plain-English labels
+const ACTION_LABELS: Record<string, { color: string; emoji: string; label: string; sub: string }> = {
+    dispatch_now: { color: "var(--priority-p0)", emoji: "🚨", label: "Send Help Now", sub: "This situation needs an immediate response." },
+    dispatch_soon: { color: "var(--priority-p1)", emoji: "🔔", label: "Send Help Shortly", sub: "Help should be sent as soon as possible." },
+    monitor: { color: "var(--priority-p2)", emoji: "👁️", label: "Keep an Eye On It", sub: "Watch the situation closely but no immediate action needed." },
+    request_more_info: { color: "var(--priority-p3)", emoji: "❓", label: "Need More Details", sub: "We need more information before deciding what to do." },
 };
+
+// Maps priority codes → plain words and colour
+const URGENCY: Record<string, { label: string; color: string }> = {
+    p0: { label: "Critical", color: "var(--priority-p0)" },
+    p1: { label: "High", color: "var(--priority-p1)" },
+    p2: { label: "Medium", color: "var(--priority-p2)" },
+    p3: { label: "Low", color: "var(--priority-p3)" },
+};
+
+// Human-readable danger field names
+function toHumanLabel(key: string) {
+    const map: Record<string, string> = {
+        location: "📍 Location unknown",
+        people_count: "👥 Number of people unclear",
+        injuries_present: "🩹 Injury status unclear",
+        weapon_mentioned: "⚠️ Weapon involvement unclear",
+        smoke_fire_present: "🔥 Fire / smoke status unclear",
+        injury_status_unclear: "🩹 Injury status unclear",
+    };
+    return map[key] ?? key.replace(/_/g, " ");
+}
 
 interface Props {
     report: IncomingReport;
@@ -23,38 +47,41 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
     const s = report.extracted_features;
     const t = report.triage;
     const r = report.recommended;
-    const action = r ? ACTION_STYLES[r.action] ?? ACTION_STYLES.monitor : null;
+
+    // Resolve urgency from triage priority or risk_level
+    const priorityKey = t?.priority?.toLowerCase() ?? ({ critical: "p0", high: "p1", medium: "p2", low: "p3" }[report.risk_level] ?? "p2");
+    const urgency = URGENCY[priorityKey] ?? URGENCY.p2;
+
+    const action = r ? (ACTION_LABELS[r.action] ?? ACTION_LABELS.monitor) : null;
 
     return (
         <div className="detail-panel" id="report-detail">
             {/* ---- Header ---- */}
             <div className="detail-header">
-                <h2>
-                    {report.type.replace(/_/g, " ").toUpperCase()}
-                </h2>
+                <h2>{report.type.replace(/_/g, " ").toUpperCase()}</h2>
                 <span className="detail-id">#{report.id.slice(0, 8)}</span>
             </div>
 
-            {/* ---- Raw Report ---- */}
+            {/* ---- What was reported ---- */}
             <section className="detail-section">
-                <h3>📝 Raw Report</h3>
+                <h3>📝 What Was Reported</h3>
                 <div className="report-box">
                     <p>{report.text}</p>
                     <div className="report-meta">
-                        <span>Source: {report.source}</span>
+                        <span>Reported via: {report.source === "voice" ? "🎙️ Voice recording" : report.source}</span>
                         <span>Location: {report.location}</span>
                         <span>Time: {new Date(report.time).toLocaleString()}</span>
                     </div>
                 </div>
             </section>
 
-            {/* ---- Extracted Features ---- */}
+            {/* ---- Situation Summary ---- */}
             {s && (
                 <section className="detail-section">
-                    <h3>🔍 Extracted Features</h3>
+                    <h3>📋 Situation Summary</h3>
                     <div className="features-grid">
                         <div className="feature-item">
-                            <label>Type</label>
+                            <label>Incident Type</label>
                             <span className="feature-value type-tag">
                                 {s.incident_type.replace(/_/g, " ")}
                             </span>
@@ -62,91 +89,85 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
                         <div className="feature-item">
                             <label>Location</label>
                             <span className="feature-value">
-                                {s.key_entities.location ?? "—"}
+                                {s.key_entities.location ?? "Not mentioned"}
                             </span>
                         </div>
                         <div className="feature-item">
-                            <label>People Count</label>
+                            <label>People Involved</label>
                             <span className="feature-value">
-                                {s.key_entities.people_count ?? "—"}
+                                {s.key_entities.people_count != null ? `~${s.key_entities.people_count} people` : "Unknown"}
                             </span>
                         </div>
                         <div className="feature-item">
-                            <label>Injuries</label>
+                            <label>Anyone Injured?</label>
                             <span className={`feature-value ${s.key_entities.injuries_present ? "danger" : ""}`}>
-                                {s.key_entities.injuries_present ? "Yes" : "No"}
+                                {s.key_entities.injuries_present === true ? "⚠️ Yes" : s.key_entities.injuries_present === false ? "No" : "Unknown"}
                             </span>
                         </div>
                         <div className="feature-item">
-                            <label>Weapon</label>
+                            <label>Weapon Involved?</label>
                             <span className={`feature-value ${s.key_entities.weapon_mentioned ? "danger" : ""}`}>
-                                {s.key_entities.weapon_mentioned ? "Yes" : "No"}
+                                {s.key_entities.weapon_mentioned === true ? "⚠️ Yes" : s.key_entities.weapon_mentioned === false ? "No" : "Unknown"}
                             </span>
                         </div>
                         <div className="feature-item">
-                            <label>Fire / Smoke</label>
+                            <label>Fire or Smoke?</label>
                             <span className={`feature-value ${s.key_entities.smoke_fire_present ? "danger" : ""}`}>
-                                {s.key_entities.smoke_fire_present ? "Yes" : "No"}
+                                {s.key_entities.smoke_fire_present === true ? "🔥 Yes" : s.key_entities.smoke_fire_present === false ? "No" : "Unknown"}
                             </span>
                         </div>
                         <div className="feature-item">
-                            <label>Aggression</label>
+                            <label>Violence Level</label>
                             <div className="level-bar">
                                 <div className="level-fill aggression" style={{ width: `${(s.risk_factors.aggression_level / 3) * 100}%` }} />
-                                <span>{s.risk_factors.aggression_level}/3</span>
+                                <span>{["None", "Low", "Moderate", "High"][s.risk_factors.aggression_level] ?? "—"}</span>
                             </div>
                         </div>
                         <div className="feature-item">
-                            <label>Crowd Level</label>
+                            <label>Crowd Size</label>
                             <div className="level-bar">
                                 <div className="level-fill crowd" style={{ width: `${(s.risk_factors.crowd_level / 3) * 100}%` }} />
-                                <span>{s.risk_factors.crowd_level}/3</span>
+                                <span>{["Small", "Small", "Moderate", "Large"][s.risk_factors.crowd_level] ?? "—"}</span>
                             </div>
                         </div>
                         <div className="feature-item">
-                            <label>Active Threat</label>
+                            <label>Ongoing Danger?</label>
                             <span className={`feature-value ${s.risk_factors.active_threat ? "danger" : ""}`}>
-                                {s.risk_factors.active_threat ? "⚠ YES" : "No"}
+                                {s.risk_factors.active_threat ? "⚠️ Yes — still unfolding" : "No"}
                             </span>
                         </div>
                         <div className="feature-item">
-                            <label>Confidence</label>
+                            <label>AI Certainty</label>
                             <span className="feature-value">
-                                {(s.confidence * 100).toFixed(0)}%
+                                {(s.confidence * 100).toFixed(0)}% sure
                             </span>
                         </div>
                     </div>
-                    {s.missing_info.length > 0 && (
-                        <div className="missing-info">
-                            ⚠ Missing: {s.missing_info.join(", ")}
-                        </div>
-                    )}
                 </section>
             )}
 
-            {/* ---- Triage Score ---- */}
+            {/* ---- Urgency Level (replaces "Triage Score") ---- */}
             {t && (
                 <section className="detail-section">
-                    <h3>📊 Triage Score</h3>
+                    <h3>🚦 Urgency Level</h3>
                     <div className="triage-display">
                         <div className="triage-score">
                             <div
                                 className="score-ring"
                                 style={{
-                                    background: `conic-gradient(var(--priority-${t.priority.toLowerCase()}) ${t.score * 3.6}deg, var(--bg-tertiary) 0deg)`,
+                                    background: `conic-gradient(${urgency.color} ${t.score * 3.6}deg, var(--bg-tertiary) 0deg)`,
                                 }}
                             >
                                 <div className="score-inner">
-                                    <span className="score-num">{t.score}</span>
-                                    <span className="score-label">{t.priority}</span>
+                                    <span className="score-num" style={{ color: urgency.color }}>{urgency.label}</span>
                                 </div>
                             </div>
                         </div>
                         <div className="triage-reasons">
-                            <h4>Key Factors</h4>
+                            <h4>Why this urgency?</h4>
                             <ul>
                                 {t.reasons.map((reason, i) => (
-                                    <li key={i}>{reason}</li>
+                                    <li key={i}>{reason.replace(/_/g, " ")}</li>
                                 ))}
                             </ul>
                         </div>
@@ -154,31 +175,32 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
                 </section>
             )}
 
-            {/* ---- Missing Information ---- */}
+            {/* ---- What we still need to know ---- */}
             {s && s.missing_info.length > 0 && (
                 <section className="detail-section">
-                    <h3>⚠️ Missing Information</h3>
+                    <h3>❓ What We Still Need to Know</h3>
                     <ul className="missing-list">
                         {s.missing_info.map((info, i) => (
-                            <li key={i} className="missing-item">{info}</li>
+                            <li key={i} className="missing-item">{toHumanLabel(info)}</li>
                         ))}
                     </ul>
                 </section>
             )}
 
-            {/* ---- Recommended Action ---- */}
+            {/* ---- Suggested Response ---- */}
             {r && (
                 <section className="detail-section">
-                    <h3>🎯 Recommended Action</h3>
+                    <h3>✅ Suggested Response</h3>
                     {action && (
                         <div className="action-banner" style={{ borderLeftColor: action.color }}>
-                            <span className="action-label">{action.label}</span>
-                            <p className="action-rationale">{r.rationale}</p>
+                            <span className="action-label">{action.emoji} {action.label}</span>
+                            <p className="action-rationale">{action.sub}</p>
+                            {r.rationale && <p className="action-rationale" style={{ marginTop: "6px" }}>{r.rationale}</p>}
                         </div>
                     )}
                     <div className="rec-columns">
                         <div className="rec-col">
-                            <h4>📋 Checklist</h4>
+                            <h4>📋 Steps to Take</h4>
                             <ul className="checklist">
                                 {r.checklist.map((item, i) => (
                                     <li key={i}>
@@ -189,7 +211,7 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
                             </ul>
                         </div>
                         <div className="rec-col">
-                            <h4>❓ Follow-up Questions</h4>
+                            <h4>💬 Questions to Ask the Reporter</h4>
                             <ol className="followup-list">
                                 {r.follow_up_questions.map((q, i) => (
                                     <li key={i}>{q}</li>
@@ -207,17 +229,17 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
                     onClick={() => onCreateIncident(report.id)}
                     disabled={creating || dismissed}
                 >
-                    {creating ? "Creating…" : "🚀 Create Incident"}
+                    {creating ? "Sending…" : "🚨 Send for Response"}
                 </button>
                 <button className="btn btn-request-info" disabled={dismissed}>
-                    ❓ Request More Info
+                    💬 Ask for More Info
                 </button>
                 <button
                     className="btn btn-dismiss"
                     onClick={() => { setDismissed(true); onDismiss(report.id); }}
                     disabled={creating || dismissed}
                 >
-                    {dismissed ? "Dismissed" : "✕ Dismiss"}
+                    {dismissed ? "Closed" : "✕ Not an Incident"}
                 </button>
             </div>
         </div>

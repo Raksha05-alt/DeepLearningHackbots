@@ -615,20 +615,23 @@ body {
 }
 
 .score-inner {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   background: var(--bg-secondary);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 6px;
+  text-align: center;
 }
 
 .score-num {
-  font-size: 1.6rem;
+  font-size: 1rem;
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.1;
+  word-break: break-word;
 }
 
 .score-label {
@@ -1180,4 +1183,249 @@ body {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* ================================================================
+   Voice Recorder Component
+   ================================================================ */
+
+/* Record tab button — slight accent so it stands out */
+.tab-btn-record:not(.active) {
+  background: linear-gradient(135deg, rgba(248, 81, 73, 0.08), rgba(240, 136, 62, 0.06));
+  border-color: rgba(248, 81, 73, 0.2);
+}
+
+.tab-btn-record:not(.active):hover {
+  background: rgba(248, 81, 73, 0.12);
+  border-color: rgba(248, 81, 73, 0.35);
+}
+
+/* ---- VoiceRecorder container ---- */
+.voice-recorder {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 16px;
+  height: 100%;
+}
+
+.vr-header {
+  text-align: center;
+}
+
+.vr-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.vr-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ---- Mic button area ---- */
+.vr-button-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 0;
+}
+
+.vr-mic-btn {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  position: relative;
+  outline: none;
+}
+
+/* idle */
+.vr-mic-btn.idle {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+  border: 2px solid var(--accent-dim);
+}
+
+.vr-mic-btn.idle:hover {
+  transform: scale(1.06);
+  background: rgba(88, 166, 255, 0.12);
+  box-shadow: 0 6px 24px rgba(88, 166, 255, 0.2);
+}
+
+/* recording — pulsing red */
+.vr-mic-btn.recording {
+  background: rgba(248, 81, 73, 0.15);
+  color: var(--danger);
+  border: 2px solid var(--danger);
+  animation: vr-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes vr-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 0 16px rgba(248, 81, 73, 0);
+  }
+}
+
+/* processing — dim */
+.vr-mic-btn.processing {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border: 2px solid var(--border);
+  cursor: not-allowed;
+}
+
+.vr-icon {
+  width: 36px;
+  height: 36px;
+}
+
+/* ---- Spinner ---- */
+.vr-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: vr-spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes vr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Status label ---- */
+.vr-status-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.vr-recording-label {
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vr-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  animation: vr-blink 0.9s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes vr-blink {
+  from {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Error ---- */
+.vr-error {
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.25);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: var(--danger);
+  line-height: 1.5;
+}
+
+/* ---- Result preview ---- */
+.vr-result {
+  background: rgba(63, 185, 80, 0.08);
+  border: 1px solid rgba(63, 185, 80, 0.25);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.vr-result-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--success);
+  margin-bottom: 6px;
+}
+
+.vr-result-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- Tips ---- */
+.vr-tips {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.vr-tips-title {
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vr-tips ul {
+  padding-left: 16px;
+}
+
+.vr-tips li {
+  margin-bottom: 4px;
+}
+
+.vr-tips em {
+  color: var(--text-primary);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ---- ReportCard voice badge ---- */
+.card-source-voice {
+  background: rgba(248, 81, 73, 0.15);
+  color: #f07080;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
