@@ -92,12 +92,7 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
                                 {s.key_entities.location ?? "Not mentioned"}
                             </span>
                         </div>
-                        <div className="feature-item">
-                            <label>People Involved</label>
-                            <span className="feature-value">
-                                {s.key_entities.people_count != null ? `~${s.key_entities.people_count} people` : "Unknown"}
-                            </span>
-                        </div>
+
                         <div className="feature-item">
                             <label>Anyone Injured?</label>
                             <span className={`feature-value ${s.key_entities.injuries_present ? "danger" : ""}`}>
@@ -116,20 +111,7 @@ export default function ReportDetail({ report, onCreateIncident, onDismiss, crea
                                 {s.key_entities.smoke_fire_present === true ? "🔥 Yes" : s.key_entities.smoke_fire_present === false ? "No" : "Unknown"}
                             </span>
                         </div>
-                        <div className="feature-item">
-                            <label>Violence Level</label>
-                            <div className="level-bar">
-                                <div className="level-fill aggression" style={{ width: `${(s.risk_factors.aggression_level / 3) * 100}%` }} />
-                                <span>{["None", "Low", "Moderate", "High"][s.risk_factors.aggression_level] ?? "—"}</span>
-                            </div>
-                        </div>
-                        <div className="feature-item">
-                            <label>Crowd Size</label>
-                            <div className="level-bar">
-                                <div className="level-fill crowd" style={{ width: `${(s.risk_factors.crowd_level / 3) * 100}%` }} />
-                                <span>{["Small", "Small", "Moderate", "Large"][s.risk_factors.crowd_level] ?? "—"}</span>
-                            </div>
-                        </div>
+
                         <div className="feature-item">
                             <label>Ongoing Danger?</label>
                             <span className={`feature-value ${s.risk_factors.active_threat ? "danger" : ""}`}>

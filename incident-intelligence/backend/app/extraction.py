@@ -93,6 +93,7 @@ _AGGRESSION_KEYWORDS_HIGH = [
     "attacking", "rampage", "killing", "murder", "threatening to kill",
     "active shooter", "hostage", "brandishing",
     "gonna kill", "going to kill", "trying to kill", "slashing people",
+    "running around with a knife", "with a knife", "swinging a knife",
 ]
 _AGGRESSION_KEYWORDS_MED = [
     "threatening", "aggressive", "violent", "hostile", "confrontation",
@@ -119,6 +120,7 @@ _INJURY_KEYWORDS = [
     "blood everywhere", "covered in blood", "need medical",
     "not moving", "not breathing", "passed out", "on the ground",
     "broken", "fractured", "in pain", "screaming in pain",
+    "stabbed", "stabbing", "stab", "shot",
 ]
 
 # ---------------------------------------------------------------------------
@@ -165,7 +167,7 @@ _SG_LOCATIONS = [
 ]
 
 _LOCATION_RE = re.compile(
-    r"(?:at|near|in|around|outside|opposite)\s+(.+?)(?:\.|,|$)",
+    r"\b(?:at|near|in|outside|opposite)\b\s+(.+?)(?:\.|,|$)",
     re.IGNORECASE,
 )
 
@@ -221,22 +223,22 @@ def extract_incident_features(
 
     # ---- Key entities ---------------------------------------------------
 
-    # Location: prefer explicit hint, then known SG place names, then regex
+    # Location: prefer explicit hint, then regex (for fuller names), then known SG place names
     location = location_hint if location_hint else None
     if not location:
-        # Search for known Singapore locations in the text (case-insensitive)
-        for sg_loc in sorted(_SG_LOCATIONS, key=len, reverse=True):
-            if sg_loc.lower() in text_lower:
-                location = sg_loc
-                break
-    if not location:
-        # Fallback: try "at/near/in <location>" pattern
+        # Try "at/near/in <location>" pattern first to catch full names like "Bishan Junction 8"
         loc_match = _LOCATION_RE.search(text)
         if loc_match:
             candidate = loc_match.group(1).strip()
             # Only accept if it looks like a proper noun (starts with uppercase)
             if candidate and candidate[0].isupper() and len(candidate) > 2:
                 location = candidate
+    if not location:
+        # Fallback: Search for known Singapore locations in the text (case-insensitive)
+        for sg_loc in sorted(_SG_LOCATIONS, key=len, reverse=True):
+            if sg_loc.lower() in text_lower:
+                location = sg_loc
+                break
 
     people_count = None
     for phrase, count in _SPOKEN_COUNT_MAP.items():
@@ -296,8 +298,6 @@ def extract_incident_features(
     missing_info: List[str] = []
     if location is None:
         missing_info.append("location")
-    if people_count is None:
-        missing_info.append("people_count")
     if not injuries_present and not any(
         w in text_lower for w in ["no injur", "no one hurt", "nobody hurt"]
     ):
