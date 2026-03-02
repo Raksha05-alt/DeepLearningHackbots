@@ -46,8 +46,8 @@ export default function CallerApp() {
 
             mediaRecorder.onstop = async () => {
                 stream.getTracks().forEach((t) => t.stop());
-                const ext = mimeType.includes("mp4") ? "audio/mp4" : "audio/webm";
-                const blob = new Blob(chunksRef.current, { type: ext });
+                const actualMime = mediaRecorder.mimeType || mimeType;
+                const blob = new Blob(chunksRef.current, { type: actualMime });
                 setState("processing");
                 try {
                     const result = await transcribeAudio(blob, "en");
@@ -76,7 +76,7 @@ export default function CallerApp() {
                 }
             };
 
-            mediaRecorder.start();
+            mediaRecorder.start(1000); // 1-second chunks
             mediaRef.current = mediaRecorder;
             setState("recording");
         } catch (err: any) {

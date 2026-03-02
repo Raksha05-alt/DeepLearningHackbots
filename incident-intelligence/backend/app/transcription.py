@@ -231,6 +231,16 @@ def transcribe_audio_bytes(
         tmp.write(audio_bytes)
         tmp_path = tmp.name
 
+    print(f"[DEBUG] Received audio file '{filename}' with size {len(audio_bytes)} bytes", flush=True)
+
+    try:
+        import shutil
+        debug_path = f"/tmp/debug_audio{ext}"
+        shutil.copy2(tmp_path, debug_path)
+        print(f"[DEBUG] Saved debug audio copy to {debug_path}", flush=True)
+    except Exception as e:
+        print(f"[DEBUG] Failed to save debug audio copy: {e}", flush=True)
+
     try:
         return transcribe_audio(tmp_path, language=language)
     finally:
