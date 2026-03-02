@@ -1536,3 +1536,51 @@ body {
 .timeline::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* ---- Timeline speaker attribution ---- */
+.timeline-speaker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0 2px;
+}
+
+.speaker-callsign {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--accent);
+  background: rgba(88, 166, 255, 0.12);
+  border: 1px solid rgba(88, 166, 255, 0.25);
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.speaker-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ---- Responder card callsign badge ---- */
+.responder-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.responder-callsign {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent);
+  background: rgba(88, 166, 255, 0.1);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

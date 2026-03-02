@@ -226,6 +226,12 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                                         {new Date(event.time).toLocaleTimeString()}
                                     </span>
                                 </div>
+                                {(event as any).speaker && (
+                                    <div className="timeline-speaker">
+                                        <span className="speaker-callsign">{(event as any).callsign}</span>
+                                        <span className="speaker-name">{(event as any).speaker}</span>
+                                    </div>
+                                )}
                                 <p className="timeline-desc">{event.description}</p>
                             </div>
                         </div>
@@ -241,7 +247,12 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                     <div className="responders-grid">
                         {incident.responders.map((r, i) => (
                             <div key={i} className="responder-card">
-                                <div className="responder-name">{r.name}</div>
+                                <div className="responder-header">
+                                    <span className="responder-name">{r.name}</span>
+                                    {(r as any).callsign && (
+                                        <span className="responder-callsign">{(r as any).callsign}</span>
+                                    )}
+                                </div>
                                 <div className="responder-role">{r.role}</div>
                                 <div className="responder-unit">{r.unit}</div>
                             </div>

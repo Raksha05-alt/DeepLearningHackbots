@@ -31,7 +31,7 @@ from .similarity import get_similar_cases
 from .recommendations import recommend_response
 from .seed import seed_if_empty
 from .transcription import TranscriptionError, transcribe_audio_bytes
-from .radio_sim import get_radio_message
+from .radio_sim import get_radio_transmission
 
 # ---------------------------------------------------------------------------
 # In-memory stores for the dispatch workflow
@@ -217,16 +217,16 @@ def _seed_active_incidents() -> None:
             "status": "active",
             "type": "violence_conflict",
             "responders": [
-                {"name": "SGT Tan Wei", "role": "Lead Officer", "unit": "Alpha-1"},
-                {"name": "CPL Ng Li", "role": "Backup", "unit": "Alpha-2"},
-                {"name": "AMB Unit 14", "role": "Medical", "unit": "EMS"},
+                {"name": "SGT Tan Wei", "callsign": "Echo-1", "role": "Lead Officer", "unit": "E Div FRC"},
+                {"name": "CPL Ng Li", "callsign": "Echo-2", "role": "Backup", "unit": "E Div FRC"},
+                {"name": "Paramedic Siew", "callsign": "A241", "role": "Medical", "unit": "SCDF Ambulance"},
             ],
             "timeline": [
-                {"time": (now.replace(minute=max(now.minute - 45, 0))).isoformat(), "type": "report", "description": "Hotline report received: armed suspect at Clementi MRT"},
-                {"time": (now.replace(minute=max(now.minute - 42, 0))).isoformat(), "type": "dispatch", "description": "Alpha-1 and Alpha-2 dispatched. ETA 8 minutes."},
-                {"time": (now.replace(minute=max(now.minute - 35, 0))).isoformat(), "type": "radio", "description": "Alpha-1 on scene. Suspect cornered at platform level. Area cordoned."},
-                {"time": (now.replace(minute=max(now.minute - 28, 0))).isoformat(), "type": "radio", "description": "Suspect apprehended. One civilian with minor injuries."},
-                {"time": (now.replace(minute=max(now.minute - 25, 0))).isoformat(), "type": "update", "description": "AMB Unit 14 treating injured civilian. Non-life-threatening."},
+                {"time": (now.replace(minute=max(now.minute - 45, 0))).isoformat(), "type": "report", "description": "999 hotline report received: armed suspect at Clementi MRT"},
+                {"time": (now.replace(minute=max(now.minute - 42, 0))).isoformat(), "type": "dispatch", "description": "Echo-1 and Echo-2 dispatched from Clementi NPC. ETA 8 minutes."},
+                {"time": (now.replace(minute=max(now.minute - 35, 0))).isoformat(), "type": "radio", "speaker": "SGT Tan Wei", "callsign": "Echo-1", "description": "On scene. Suspect cornered at platform level. Area cordoned."},
+                {"time": (now.replace(minute=max(now.minute - 28, 0))).isoformat(), "type": "radio", "speaker": "CPL Ng Li", "callsign": "Echo-2", "description": "Suspect apprehended. One civilian with minor injuries."},
+                {"time": (now.replace(minute=max(now.minute - 25, 0))).isoformat(), "type": "update", "speaker": "Paramedic Siew", "callsign": "A241", "description": "Treating injured civilian. Non-life-threatening."},
             ],
             "extracted_features": {
                 "incident_type": "violence_conflict",
@@ -244,13 +244,14 @@ def _seed_active_incidents() -> None:
             "status": "deploying",
             "type": "fire_smoke",
             "responders": [
-                {"name": "SCDF Engine 7", "role": "Fire Response", "unit": "Fire-7"},
-                {"name": "SCDF Rescue 3", "role": "Search & Rescue", "unit": "Rescue-3"},
+                {"name": "CPT Wong", "callsign": "PL131", "role": "Fire Attack", "unit": "SCDF Pumper Ladder"},
+                {"name": "SGT1 Chen", "callsign": "LFAV-132", "role": "Search & Rescue", "unit": "SCDF Red Rhino"},
+                {"name": "Paramedic Lee", "callsign": "A131", "role": "Medical", "unit": "SCDF Ambulance"},
             ],
             "timeline": [
-                {"time": (now.replace(minute=max(now.minute - 12, 0))).isoformat(), "type": "report", "description": "Citizen app report: smoke from 5th floor window of Block 45"},
-                {"time": (now.replace(minute=max(now.minute - 10, 0))).isoformat(), "type": "dispatch", "description": "SCDF Engine 7 and Rescue 3 dispatched. ETA 6 minutes."},
-                {"time": (now.replace(minute=max(now.minute - 5, 0))).isoformat(), "type": "radio", "description": "Engine 7 en route. Residents self-evacuating."},
+                {"time": (now.replace(minute=max(now.minute - 12, 0))).isoformat(), "type": "report", "description": "995 hotline report: smoke from 5th floor window of Block 45"},
+                {"time": (now.replace(minute=max(now.minute - 10, 0))).isoformat(), "type": "dispatch", "description": "PL131 and LFAV-132 dispatched from Toa Payoh Fire Station. ETA 6 minutes."},
+                {"time": (now.replace(minute=max(now.minute - 5, 0))).isoformat(), "type": "radio", "speaker": "CPT Wong", "callsign": "PL131", "description": "En route. Residents self-evacuating."},
             ],
             "extracted_features": {
                 "incident_type": "fire_smoke",
@@ -268,13 +269,14 @@ def _seed_active_incidents() -> None:
             "status": "active",
             "type": "traffic_accident",
             "responders": [
-                {"name": "TP Unit 22", "role": "Traffic Police", "unit": "TP-22"},
+                {"name": "SSGT Yeo", "callsign": "TP-22", "role": "Traffic Police", "unit": "TP Expressway Patrol"},
+                {"name": "Paramedic Raj", "callsign": "A341", "role": "Medical", "unit": "SCDF Ambulance"},
             ],
             "timeline": [
-                {"time": (now.replace(minute=max(now.minute - 30, 0))).isoformat(), "type": "report", "description": "Hotline report: 4-car pile-up on CTE Southbound near Braddell"},
-                {"time": (now.replace(minute=max(now.minute - 27, 0))).isoformat(), "type": "dispatch", "description": "TP Unit 22 dispatched. Tow truck alerted."},
-                {"time": (now.replace(minute=max(now.minute - 20, 0))).isoformat(), "type": "radio", "description": "TP-22 on scene. 2 lanes blocked. Directing traffic."},
-                {"time": (now.replace(minute=max(now.minute - 10, 0))).isoformat(), "type": "update", "description": "One vehicle towed. Remaining vehicles movable. No injuries."},
+                {"time": (now.replace(minute=max(now.minute - 30, 0))).isoformat(), "type": "report", "description": "999 hotline report: 4-car pile-up on CTE Southbound near Braddell"},
+                {"time": (now.replace(minute=max(now.minute - 27, 0))).isoformat(), "type": "dispatch", "description": "TP-22 dispatched from TP HQ. Tow truck alerted."},
+                {"time": (now.replace(minute=max(now.minute - 20, 0))).isoformat(), "type": "radio", "speaker": "SSGT Yeo", "callsign": "TP-22", "description": "On scene. 2 lanes blocked. Setting up diversion."},
+                {"time": (now.replace(minute=max(now.minute - 10, 0))).isoformat(), "type": "update", "speaker": "SSGT Yeo", "callsign": "TP-22", "description": "One vehicle towed. Remaining vehicles movable. No injuries."},
             ],
             "extracted_features": {
                 "incident_type": "traffic_accident",
@@ -594,15 +596,15 @@ async def ws_radio_feed(websocket: WebSocket, incident_id: str):
             delay = random.uniform(8, 15)
             await asyncio.sleep(delay)
 
-            # Generate radio message
+            # Generate speaker-attributed radio transmission
             inc_type = incident.get("type", "other")
-            radio_text = get_radio_message(inc_type)
+            tx = get_radio_transmission(inc_type, incident.get("responders"))
             now = datetime.now(timezone.utc).isoformat()
 
             # --- Continuous extraction ---
             # Re-run extraction on the new radio text
             try:
-                new_features = extract_incident_features(radio_text)
+                new_features = extract_incident_features(tx["message"])
             except Exception:
                 new_features = None
 
@@ -622,11 +624,13 @@ async def ws_radio_feed(websocket: WebSocket, incident_id: str):
                 if nf.get("risk_factors", {}).get("active_threat") is True:
                     ef["risk_factors"]["active_threat"] = True
 
-            # Append timeline entry
+            # Append timeline entry with speaker attribution
             entry = {
                 "time": now,
                 "type": "radio",
-                "description": radio_text,
+                "speaker": tx["speaker"],
+                "callsign": tx["callsign"],
+                "description": tx["message"],
             }
             incident["timeline"].append(entry)
 
