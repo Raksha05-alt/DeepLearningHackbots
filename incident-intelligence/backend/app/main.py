@@ -31,7 +31,7 @@ from .similarity import get_similar_cases
 from .recommendations import recommend_response
 from .seed import seed_if_empty
 from .transcription import TranscriptionError, transcribe_audio_bytes
-from .radio_sim import get_radio_transmission
+from .radio_sim import get_radio_transmission, _FALLBACK_SPEAKERS
 
 # ---------------------------------------------------------------------------
 # In-memory stores for the dispatch workflow
@@ -642,8 +642,33 @@ async def ws_radio_feed(websocket: WebSocket, incident_id: str):
     })
 
     async def radio_loop():
-        """Simulate radio transmissions."""
+        """Simulate radio transmissions and incident lifecycle."""
+        radio_count = 0
+
         while True:
+            # --- Simulated Dispatch ---
+            if incident.get("status") == "deploying" and not incident.get("responders"):
+                await asyncio.sleep(random.uniform(2, 4))
+                
+                # Assign generic full team
+                inc_type = incident.get("type", "other")
+                fallback_team = _FALLBACK_SPEAKERS.get(inc_type, _FALLBACK_SPEAKERS["other"])
+                incident["responders"] = list(fallback_team)
+                
+                now = datetime.now(timezone.utc).isoformat()
+                dispatch_entry = {
+                    "time": now,
+                    "type": "dispatch",
+                    "description": f"Control has dispatched {len(fallback_team)} units to the scene.",
+                }
+                incident["timeline"].append(dispatch_entry)
+                
+                await _broadcast(incident_id, {
+                    "type": "radio_update",
+                    "entry": dispatch_entry,
+                    "responders": incident["responders"],
+                })
+
             delay = random.uniform(8, 15)
             await asyncio.sleep(delay)
 
@@ -684,8 +709,37 @@ async def ws_radio_feed(websocket: WebSocket, incident_id: str):
                 "description": tx["message"],
             }
             incident["timeline"].append(entry)
+            radio_count += 1
 
-            # Broadcast to all connected clients
+            # --- Auto-Activation ---
+            status_update = None
+            if incident.get("status") == "deploying" and radio_count >= 2:
+                incident["status"] = "active"
+                status_update = "active"
+                activation_entry = {
+                    "time": now,
+                    "type": "update",
+                    "description": "Status changed to: active (First responders confirmed on scene)",
+                }
+                incident["timeline"].append(activation_entry)
+                
+                # We broadcast the radio update FIRST
+                await _broadcast(incident_id, {
+                    "type": "radio_update",
+                    "entry": entry,
+                    "extracted_features": incident.get("extracted_features"),
+                })
+                
+                # THEN we broadcast the activation timeline update
+                await asyncio.sleep(0.5)
+                await _broadcast(incident_id, {
+                    "type": "radio_update",
+                    "entry": activation_entry,
+                    "status": "active",
+                })
+                continue # Skip the normal broadcast below
+
+            # Normal broadcast to all connected clients
             await _broadcast(incident_id, {
                 "type": "radio_update",
                 "entry": entry,

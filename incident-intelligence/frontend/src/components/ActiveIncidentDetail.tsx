@@ -1,7 +1,7 @@
 /** IntelResponse – Active incident detail panel with live WebSocket radio feed. */
 
 import { useEffect, useRef, useState } from "react";
-import type { ActiveIncident, TimelineEvent } from "../types";
+import type { ActiveIncident, TimelineEvent, Responder } from "../types";
 import { updateActiveStatus } from "../api";
 
 const WS_BASE = "ws://localhost:8000";
@@ -33,6 +33,8 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
     // ---- WebSocket live feed state ----
     const [liveTimeline, setLiveTimeline] = useState<TimelineEvent[]>(incident.timeline);
     const [liveFeatures, setLiveFeatures] = useState(incident.extracted_features);
+    const [liveStatus, setLiveStatus] = useState<string>(incident.status);
+    const [liveResponders, setLiveResponders] = useState<Responder[]>(incident.responders);
     const [wsConnected, setWsConnected] = useState(false);
     const [newEntryIdx, setNewEntryIdx] = useState<number | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
@@ -42,7 +44,9 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
     useEffect(() => {
         setLiveTimeline(incident.timeline);
         setLiveFeatures(incident.extracted_features);
-    }, [incident.id]);
+        setLiveStatus(incident.status);
+        setLiveResponders(incident.responders);
+    }, [incident.id, incident.status, incident.responders]);
 
     // ---- WebSocket connection ----
     useEffect(() => {
@@ -72,6 +76,12 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                     // Update extracted features (continuous extraction)
                     if (data.extracted_features) {
                         setLiveFeatures(data.extracted_features);
+                    }
+                    if (data.status) {
+                        setLiveStatus(data.status);
+                    }
+                    if (data.responders) {
+                        setLiveResponders(data.responders);
                     }
                 }
             } catch {
@@ -104,7 +114,7 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
     };
 
     const s = liveFeatures;
-    const ss = STATUS_STYLES[incident.status] ?? STATUS_STYLES.active;
+    const ss = STATUS_STYLES[liveStatus] ?? STATUS_STYLES.active;
 
     return (
         <div className="detail-panel" id="active-detail">
@@ -146,7 +156,7 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                             className="feature-value status-value"
                             style={{ color: ss.color }}
                         >
-                            {incident.status.toUpperCase()}
+                            {liveStatus.toUpperCase()}
                         </span>
                     </div>
                 </div>
@@ -243,9 +253,9 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
             {/* ---- Responders ---- */}
             <section className="detail-section">
                 <h3>👤 Responders</h3>
-                {incident.responders.length > 0 ? (
+                {liveResponders.length > 0 ? (
                     <div className="responders-grid">
-                        {incident.responders.map((r, i) => (
+                        {liveResponders.map((r, i) => (
                             <div key={i} className="responder-card">
                                 <div className="responder-header">
                                     <span className="responder-name">{r.name}</span>
@@ -272,12 +282,12 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                     className="current-status"
                     style={{ background: ss.bg, color: ss.color, borderColor: ss.color }}
                 >
-                    Current Status: <strong>{incident.status.toUpperCase()}</strong>
+                    Current Status: <strong>{liveStatus.toUpperCase()}</strong>
                 </div>
                 {error && <div className="error-msg">{error}</div>}
-                {incident.status !== "resolved" && (
+                {liveStatus !== "resolved" && (
                     <div className="status-actions">
-                        {incident.status === "deploying" && (
+                        {liveStatus === "deploying" && (
                             <button
                                 className="btn btn-status-active"
                                 onClick={() => handleStatusChange("active")}
