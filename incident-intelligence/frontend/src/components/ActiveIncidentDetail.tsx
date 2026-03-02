@@ -1,8 +1,10 @@
-/** IntelResponse – Active incident detail panel. */
+/** IntelResponse – Active incident detail panel with live WebSocket radio feed. */
 
-import { useState } from "react";
-import type { ActiveIncident } from "../types";
+import { useEffect, useRef, useState } from "react";
+import type { ActiveIncident, TimelineEvent } from "../types";
 import { updateActiveStatus } from "../api";
+
+const WS_BASE = "ws://localhost:8000";
 
 const TIMELINE_ICONS: Record<string, string> = {
     report: "📩",
@@ -28,6 +30,66 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
     const [updating, setUpdating] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    // ---- WebSocket live feed state ----
+    const [liveTimeline, setLiveTimeline] = useState<TimelineEvent[]>(incident.timeline);
+    const [liveFeatures, setLiveFeatures] = useState(incident.extracted_features);
+    const [wsConnected, setWsConnected] = useState(false);
+    const [newEntryIdx, setNewEntryIdx] = useState<number | null>(null);
+    const wsRef = useRef<WebSocket | null>(null);
+    const timelineEndRef = useRef<HTMLDivElement | null>(null);
+
+    // Reset state when incident changes
+    useEffect(() => {
+        setLiveTimeline(incident.timeline);
+        setLiveFeatures(incident.extracted_features);
+    }, [incident.id]);
+
+    // ---- WebSocket connection ----
+    useEffect(() => {
+        const ws = new WebSocket(`${WS_BASE}/ws/incidents/${incident.id}/radio`);
+        wsRef.current = ws;
+
+        ws.onopen = () => setWsConnected(true);
+        ws.onclose = () => setWsConnected(false);
+        ws.onerror = () => setWsConnected(false);
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === "connected") {
+                    // Initial state from server
+                    if (data.timeline) setLiveTimeline(data.timeline);
+                    if (data.extracted_features) setLiveFeatures(data.extracted_features);
+                } else if (data.type === "radio_update") {
+                    // New radio transmission
+                    setLiveTimeline((prev) => {
+                        const updated = [...prev, data.entry];
+                        // Flash the new entry
+                        setNewEntryIdx(updated.length - 1);
+                        setTimeout(() => setNewEntryIdx(null), 2500);
+                        return updated;
+                    });
+                    // Update extracted features (continuous extraction)
+                    if (data.extracted_features) {
+                        setLiveFeatures(data.extracted_features);
+                    }
+                }
+            } catch {
+                // ignore malformed messages
+            }
+        };
+
+        return () => {
+            ws.close();
+            setWsConnected(false);
+        };
+    }, [incident.id]);
+
+    // Auto-scroll timeline on new entries
+    useEffect(() => {
+        timelineEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [liveTimeline.length]);
+
     const handleStatusChange = async (newStatus: string) => {
         setUpdating(newStatus);
         setError(null);
@@ -41,7 +103,7 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
         }
     };
 
-    const s = incident.extracted_features;
+    const s = liveFeatures;
     const ss = STATUS_STYLES[incident.status] ?? STATUS_STYLES.active;
 
     return (
@@ -49,7 +111,15 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
             {/* ---- Header ---- */}
             <div className="detail-header">
                 <h2>{incident.summary}</h2>
-                <span className="detail-id">#{incident.id.slice(0, 8)}</span>
+                <div className="detail-header-right">
+                    {wsConnected && (
+                        <span className="live-indicator">
+                            <span className="live-dot" />
+                            LIVE
+                        </span>
+                    )}
+                    <span className="detail-id">#{incident.id.slice(0, 8)}</span>
+                </div>
             </div>
 
             {/* ---- Incident Overview ---- */}
@@ -82,10 +152,13 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                 </div>
             </section>
 
-            {/* ---- Extracted Features ---- */}
+            {/* ---- Extracted Features (updated live) ---- */}
             {s && (
                 <section className="detail-section">
-                    <h3>🔍 Extracted Features</h3>
+                    <h3>
+                        🔍 Extracted Features
+                        {wsConnected && <span className="live-badge">UPDATING LIVE</span>}
+                    </h3>
                     <div className="features-grid">
                         <div className="feature-item">
                             <label>Injuries</label>
@@ -131,10 +204,18 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
 
             {/* ---- Live Timeline ---- */}
             <section className="detail-section">
-                <h3>⏱️ Live Timeline</h3>
+                <h3>
+                    ⏱️ Live Timeline
+                    {wsConnected && (
+                        <span className="live-badge">{liveTimeline.length} events</span>
+                    )}
+                </h3>
                 <div className="timeline">
-                    {incident.timeline.map((event, i) => (
-                        <div key={i} className={`timeline-entry timeline-${event.type}`}>
+                    {liveTimeline.map((event, i) => (
+                        <div
+                            key={`${event.time}-${i}`}
+                            className={`timeline-entry timeline-${event.type}${i === newEntryIdx ? " timeline-entry-new" : ""}`}
+                        >
                             <div className="timeline-dot">
                                 {TIMELINE_ICONS[event.type] ?? "📋"}
                             </div>
@@ -149,6 +230,7 @@ export default function ActiveIncidentDetail({ incident, onUpdated }: Props) {
                             </div>
                         </div>
                     ))}
+                    <div ref={timelineEndRef} />
                 </div>
             </section>
 

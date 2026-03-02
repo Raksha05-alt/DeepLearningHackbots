@@ -1,15 +1,19 @@
 """
 IntelResponse – FastAPI application entry point.
 Two-tab dispatch workflow: Incoming Reports + Active Incidents.
+Real-time WebSocket radio feed with continuous extraction.
 """
 
+import asyncio
+import json
+import random
 from collections import Counter
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 import uuid
 
-from fastapi import FastAPI, File, HTTPException, Query, UploadFile, status
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -27,6 +31,7 @@ from .similarity import get_similar_cases
 from .recommendations import recommend_response
 from .seed import seed_if_empty
 from .transcription import TranscriptionError, transcribe_audio_bytes
+from .radio_sim import get_radio_message
 
 # ---------------------------------------------------------------------------
 # In-memory stores for the dispatch workflow
@@ -34,6 +39,9 @@ from .transcription import TranscriptionError, transcribe_audio_bytes
 
 _incoming_reports: List[Dict[str, Any]] = []
 _active_incidents: List[Dict[str, Any]] = []
+
+# WebSocket clients per incident_id
+_ws_clients: Dict[str, Set[WebSocket]] = {}
 
 
 def _seed_reports() -> None:
@@ -522,6 +530,143 @@ async def update_active_incident_status(incident_id: str, body: StatusUpdateV2):
             })
             return inc
     raise HTTPException(status_code=404, detail="Incident not found")
+
+
+# ---------------------------------------------------------------------------
+# WebSocket – live radio feed with continuous extraction
+# ---------------------------------------------------------------------------
+
+
+async def _broadcast(incident_id: str, message: dict) -> None:
+    """Send a JSON message to all WebSocket clients watching this incident."""
+    clients = _ws_clients.get(incident_id, set())
+    dead: List[WebSocket] = []
+    for ws in clients:
+        try:
+            await ws.send_json(message)
+        except Exception:
+            dead.append(ws)
+    for ws in dead:
+        clients.discard(ws)
+
+
+@app.websocket("/ws/incidents/{incident_id}/radio")
+async def ws_radio_feed(websocket: WebSocket, incident_id: str):
+    """WebSocket endpoint for live radio feed.
+
+    On connect, starts a background loop that simulates radio
+    transmissions every 8-15 seconds.  Each transmission:
+      1. Generates contextual radio text for the incident type
+      2. Re-runs extract_incident_features() on the new text
+      3. Merges updated risk factors into the incident
+      4. Appends a timeline entry
+      5. Broadcasts to all connected clients
+    """
+    # Find the incident
+    incident = None
+    for inc in _active_incidents:
+        if inc["id"] == incident_id:
+            incident = inc
+            break
+
+    if incident is None:
+        await websocket.close(code=4004, reason="Incident not found")
+        return
+
+    await websocket.accept()
+
+    # Register client
+    if incident_id not in _ws_clients:
+        _ws_clients[incident_id] = set()
+    _ws_clients[incident_id].add(websocket)
+
+    # Send initial state
+    await websocket.send_json({
+        "type": "connected",
+        "incident_id": incident_id,
+        "timeline": incident["timeline"],
+        "extracted_features": incident.get("extracted_features"),
+    })
+
+    async def radio_loop():
+        """Simulate radio transmissions."""
+        while True:
+            delay = random.uniform(8, 15)
+            await asyncio.sleep(delay)
+
+            # Generate radio message
+            inc_type = incident.get("type", "other")
+            radio_text = get_radio_message(inc_type)
+            now = datetime.now(timezone.utc).isoformat()
+
+            # --- Continuous extraction ---
+            # Re-run extraction on the new radio text
+            try:
+                new_features = extract_incident_features(radio_text)
+            except Exception:
+                new_features = None
+
+            # Merge updated features (only upgrade, never downgrade)
+            if new_features and incident.get("extracted_features"):
+                ef = incident["extracted_features"]
+                nf = new_features
+                # Merge key_entities — only fill in missing or escalate
+                for key in ["injuries_present", "weapon_mentioned", "smoke_fire_present"]:
+                    if nf.get("key_entities", {}).get(key) is True:
+                        ef["key_entities"][key] = True
+                # Merge risk_factors — take the higher value
+                for key in ["aggression_level", "crowd_level"]:
+                    new_val = nf.get("risk_factors", {}).get(key, 0)
+                    if new_val > ef.get("risk_factors", {}).get(key, 0):
+                        ef["risk_factors"][key] = new_val
+                if nf.get("risk_factors", {}).get("active_threat") is True:
+                    ef["risk_factors"]["active_threat"] = True
+
+            # Append timeline entry
+            entry = {
+                "time": now,
+                "type": "radio",
+                "description": radio_text,
+            }
+            incident["timeline"].append(entry)
+
+            # Broadcast to all connected clients
+            await _broadcast(incident_id, {
+                "type": "radio_update",
+                "entry": entry,
+                "extracted_features": incident.get("extracted_features"),
+            })
+
+    # Run radio loop as background task
+    radio_task = asyncio.create_task(radio_loop())
+
+    try:
+        # Keep connection alive — listen for client messages
+        while True:
+            data = await websocket.receive_text()
+            # Client can send timeline entries too
+            try:
+                msg = json.loads(data)
+                if msg.get("type") == "timeline_entry":
+                    now = datetime.now(timezone.utc).isoformat()
+                    entry = {
+                        "time": now,
+                        "type": msg.get("entry_type", "update"),
+                        "description": msg.get("description", ""),
+                    }
+                    incident["timeline"].append(entry)
+                    await _broadcast(incident_id, {
+                        "type": "radio_update",
+                        "entry": entry,
+                        "extracted_features": incident.get("extracted_features"),
+                    })
+            except json.JSONDecodeError:
+                pass
+    except WebSocketDisconnect:
+        pass
+    finally:
+        radio_task.cancel()
+        _ws_clients.get(incident_id, set()).discard(websocket)
 
 
 # ---------------------------------------------------------------------------
