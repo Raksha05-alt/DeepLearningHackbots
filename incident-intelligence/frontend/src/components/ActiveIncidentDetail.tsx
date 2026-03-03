@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { ActiveIncident, TimelineEvent, Responder } from "../types";
 import { updateActiveStatus } from "../api";
+import { API_BASE } from "../config";
 
-const WS_BASE = "ws://localhost:8000";
+const WS_BASE = API_BASE.replace(/^http/, "ws");
 
 const TIMELINE_ICONS: Record<string, string> = {
     report: "📩",
